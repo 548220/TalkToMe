@@ -1,0 +1,39 @@
+# Build directories
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Log files
+*.log
+
+# Temporary files
+*.vs/
+.vscode/
+*.tmp
+*.temp
+*.log
+*.pid
+*.suo
+*.obj
+*.dll
+*.pdb
+*.cache
+*.zip
+*.rar
+
+# Configurations
+appsettings*.json
+
+# Other
+_ReSharper.Caches/
