@@ -1,0 +1,33 @@
+﻿@model IEnumerable<PizzaOverviewViewModel>
+
+@{
+    ViewData["Title"] = "Pizza List";
+}
+
+<h1>Pizza List</h1>
+
+<p>
+    <a asp-action="Create">Create New Pizza</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pizza in Model)
+        {
+            <tr>@pizza.Name</tr>
+            <tr>@pizza.Price</tr>
+            <tr>
+                <a asp-controller="Pizza" asp-action="Edit" asp-route-id="@pizza.Id" class="btn btn-primary btn-sm">Edit</a>
+                <a asp-controller="Pizza" asp-action="Delete" asp-route-id="@pizza.Id" class="btn btn-danger btn-sm">Delete</a>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-controller="Pizza" asp-action="Create" class="btn btn-primary btn-sm">Create</a>

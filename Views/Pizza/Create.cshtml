@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Create Pizza";
+}
+
+<h1>Create Pizza</h1>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label for="Name">Name</label>
+        <input type="text" id="Name" name="Name" />
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a asp-action="Index">Cancel</a>
+    </div>
+</form>
+

@@ -1,5 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
+string marioConnectionString = builder.Configuration.GetConnectionString("MarioConnection") ?? string.Empty;
+
+builder.Services.AddSingleton(marioConnectionString);
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
