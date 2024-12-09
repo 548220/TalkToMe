@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using TalkToMeMario.Models;
 using Microsoft.VisualBasic;
+using System.Runtime.InteropServices;
 
 namespace TalkToMeMario.Controllers
 {
@@ -112,6 +113,15 @@ namespace TalkToMeMario.Controllers
         {
             try
             {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                {
+                    mySqlConnection.Open();
+                    string query = $"UPDATE pizza SET name = naam, price = prijs, description = lekker WHERE id= {id}";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -121,7 +131,10 @@ namespace TalkToMeMario.Controllers
         }
 
         // GET: PizzaController/Delete/5
-        
+        public ActionResult Delete(int id)
+        {
+            return View();
+        }
 
         // POST: PizzaController/Delete/5
         [HttpPost]
