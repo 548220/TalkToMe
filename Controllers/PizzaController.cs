@@ -76,14 +76,27 @@ namespace TalkToMeMario.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                    {
+                        mySqlConnection.Open();
+                        string query = "INSERT INTO pizza ({name}, {price}) VALUES ({name}, {price});";
+                        using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                        {
+                            mySqlCommand.ExecuteNonQuery();
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View();
         }
 
         // GET: PizzaController/Edit/5

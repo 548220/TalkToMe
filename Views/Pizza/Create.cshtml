@@ -2,16 +2,25 @@
     ViewData["Title"] = "Create Pizza";
 }
 
-<h1>Create Pizza</h1>
+@model PizzaOverviewViewModel
 
-<form asp-action="Create" method="post">
-    <div>
-        <label for="Name">Name</label>
-        <input type="text" id="Name" name="Name" />
+<h2>Nieuwe Pizza Toevoegen</h2>
+
+@using (Html.BeginForm("Create", "Pizza", FormMethod.Post))
+{
+    <div class="form-group">
+        <label for="Name">Naam</label>
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name)
     </div>
-    <div>
-        <button type="submit">Save</button>
-        <a asp-action="Index">Cancel</a>
+
+    <div class="form-group">
+        <label for="Price">Prijs</label>
+        @Html.TextBoxFor(model => model.Price, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(model => model.Price)
     </div>
-</form>
+
+    <button type="submit" class="btn btn-primary">Opslaan</button>
+    <a href="@Url.Action("Index", "Pizza")" class="btn btn-secondary">Annuleren</a>
+}
 
