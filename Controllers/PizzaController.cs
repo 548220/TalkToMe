@@ -125,12 +125,12 @@ namespace TalkToMeMario.Controllers
                     mySqlConnection.Open();
                     using (MySqlCommand mySqlCommand = new MySqlCommand($"DELETE FROM pizza WHERE id = {id};", mySqlConnection))
                     {
-                        MySqlCommand.ExecuteNonQuery();
+                        mySqlCommand.ExecuteNonQuery();
                     }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex) 
             {
                 return View();
             }
