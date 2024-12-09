@@ -121,10 +121,7 @@ namespace TalkToMeMario.Controllers
         }
 
         // GET: PizzaController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        
 
         // POST: PizzaController/Delete/5
         [HttpPost]
