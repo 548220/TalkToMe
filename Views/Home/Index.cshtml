@@ -1,8 +1,28 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    Layout = null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<html>
+<head>
+    <title>Profile Selection</title>
+    <link rel="stylesheet" type="text/css" href="~/css/HomeIndex.css" />
+</head>
+<body>
+    <div class="profile-container">
+        <a href="Mario" class="profile-button">
+            <img src="~/ImageFolder/mariopfp.png" alt="Mario" />
+            <span>Mario</span>
+        </a>
+        <a href="Luigi" class="profile-button">
+            <img src="~/ImageFolder/luigipfp.png" alt="Luigi" />
+            <span>Luigi</span>
+        </a>
+        <a href="Pizza" class="profile-button">
+            <img src="~/ImageFolder/professorpanucci.png" alt="professor" />
+            <span>Panucci</span>
+        </a>
+        
+    </div>
+</body>
+</html>
