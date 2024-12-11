@@ -10,6 +10,14 @@ html {
 
 h1 {
     font-weight: bold;
+    color: white;
+}
+
+tr {
+    color: white;
+    background-color: #494949;
+    border-color: black;
+    
 }
 
 

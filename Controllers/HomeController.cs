@@ -18,26 +18,6 @@ namespace TalkToMeMario.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        public IActionResult Pizza()
-        {
-            return View();
-        }
-
-        public IActionResult Mario()
-        {
-            return View();
-        }
-
-        public IActionResult Luigi()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
