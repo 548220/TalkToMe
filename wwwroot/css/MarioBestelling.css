@@ -1,0 +1,21 @@
+﻿body {
+    padding: 0;
+}
+
+.title {
+    margin: 15px;
+    color: white;
+}
+
+.container {
+    background-color: #7C7C7C;
+    margin: 15px;
+    padding: 10px;
+    width: 45vh;    
+    height: 70vh;
+}
+
+.sidebar {
+    background-color: white;
+    padding: 3px;
+}

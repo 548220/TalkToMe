@@ -1,5 +1,27 @@
-﻿@{
+﻿@model IEnumerable<BestellingViewModel>
+
+@{
     ViewData["Title"] = "Mario";
 }
+<link rel="stylesheet" href="/css/MarioBestelling.css">
 
-<h1>Dit is waar MARIO zijn overzicht staat </h1>
+<h1 class="title">Bestellingen</h1>
+
+<div class="container">
+    <div class="sidebar">
+        <ul>
+        @foreach (var bestelling in Model)
+        {   
+            
+                <li> @bestelling.KlantNaam</li>
+                <li>@bestelling.Status</li>
+                <li>@bestelling.SubTotaal</li>
+                <li>
+                    <a asp-controller="Bestelling" asp-action="Edit" asp-route-id="@bestelling.Id" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-controller="Bestelling" asp-action="Delete" asp-route-id="@bestelling.Id" class="btn btn-danger btn-sm">Delete</a>
+                </li>
+            
+        }
+        </ul>
+    </div>
+</div>
