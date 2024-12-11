@@ -126,7 +126,7 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine("Inserting went wrong");
             }
-            return View();
+            return View(CreateBestelling);
         }
         
     }
