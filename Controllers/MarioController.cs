@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using System.Reflection.Metadata.Ecma335;
 using TalkToMeMario.Models;
 
 namespace TalkToMeMario.Controllers
@@ -98,5 +99,35 @@ namespace TalkToMeMario.Controllers
             return PartialView("_BestellingDetails", bestelling);
         }
 
+        public ActionResult CreateBestelling()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult VoegToeAanBestelling(IFormCollection collection)
+        {
+            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 3, KlantNaam = "Barry Bart", Status = "Klaar", SubTotaal = 5.80 };
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string query = "INSERT INTO bestelling ({PizzaID}) WHERE bestellingId = {id};";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Inserting went wrong");
+            }
+            return View();
+        }
+        
     }
 }

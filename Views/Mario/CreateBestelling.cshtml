@@ -1,0 +1,21 @@
+﻿@model IEnumerable<BestellingOverViewViewModel>
+
+@{
+    ViewData["Title"] = "NieweBestelling";
+}
+
+<div class="MainContainer">
+    <div class="Bestellingsoverzicht">
+        <div class="BestellingItems">
+           <h1>Hier komt overzicht</h1>
+        </div>
+    </div>
+    <div class="MenuOverzicht">
+        <a asp-controller="Mario" asp-action="VoegToeAanBestelling" class="btn btn-primary btn-sm">
+            <div class="pizzablok">
+                <h1>Margherita</h1>
+                <h1>2.80</h1>
+            </div>
+        </a>
+    </div>
+</div>
