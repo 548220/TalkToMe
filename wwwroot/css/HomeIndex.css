@@ -1,6 +1,9 @@
 ﻿body {
     padding: 0;
     margin: 0;
+    height: 100vh;
+    display: flex;
+
 }
 
 .profile-container {
@@ -8,7 +11,6 @@
     justify-content: center;
     gap: 120px;
     background-color: #3E3E3E;
-    
     width: 100%;
     height: 100%;
 }

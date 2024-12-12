@@ -10,6 +10,8 @@
 
         required
             public string Status { get; set; }
+        required
+            public List<PizzaOverviewViewModel> Pizzas { get; set; }
 
         required
             public double SubTotaal { get; set; }

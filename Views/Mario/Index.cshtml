@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BestellingViewModel>
+﻿@model IEnumerable<BestellingOverViewViewModel>
 
 @{
     ViewData["Title"] = "Mario";
@@ -35,7 +35,7 @@
 <script>
     function loadDetails(id) {
         const detailsPane = document.getElementById("detailsPanel");
-        fetch(`/Mario/details/${id}`)
+        fetch(`/Mario/_bestellingsDetails/${id}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");

@@ -16,10 +16,10 @@ namespace TalkToMeMario.Controllers
 
         public ActionResult Index()
         {
-            List<BestellingViewModel> bestellingViewModels = new List<BestellingViewModel>();
+            List<BestellingOverViewViewModel> bestellingViewModels = new List<BestellingOverViewViewModel>();
 
-            bestellingViewModels.Add(new BestellingViewModel() { Id = 1, KlantNaam = "Bertha Alkemade", Status = "Bezig", SubTotaal = 25.50 });
-            bestellingViewModels.Add(new BestellingViewModel() { Id = 2, KlantNaam = "Floris Puts", Status = "Klaar", SubTotaal = 85.00 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 1, KlantNaam = "Bertha Alkemade", Status = "Bezig", SubTotaal = 25.50 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 2, KlantNaam = "Floris Puts", Status = "Klaar", SubTotaal = 85.00 });
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
@@ -31,7 +31,7 @@ namespace TalkToMeMario.Controllers
                         {
                             while (mySqlDataReader.Read())
                             {
-                                bestellingViewModels.Add(new BestellingViewModel()
+                                bestellingViewModels.Add(new BestellingOverViewViewModel()
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
@@ -54,9 +54,9 @@ namespace TalkToMeMario.Controllers
             return View(bestellingViewModels);
         }
 
-        public IActionResult details(int id)
+        public ActionResult details(int id)
         {
-            BestellingViewModel bestelling = null;
+            BestellingOverViewViewModel bestelling = null;
 
             try
             {
@@ -69,7 +69,7 @@ namespace TalkToMeMario.Controllers
                         {
                             if (mySqlDataReader.Read())
                             {
-                                bestelling = new BestellingViewModel()
+                                bestelling = new BestellingOverViewViewModel()
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
@@ -99,35 +99,53 @@ namespace TalkToMeMario.Controllers
             return PartialView("_BestellingDetails", bestelling);
         }
 
-        public ActionResult CreateBestelling()
+        public ActionResult CreateBestelling(int? bestellingId)
         {
-            return View();
+            if (bestellingId==null)
+            {
+                //Todo: bepaal het nieuwe bestellingId
+            }
+            return View(GetBestellingDataFromDataBase());
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult VoegToeAanBestelling(IFormCollection collection)
+        private CreateBestellingViewModel GetBestellingDataFromDataBase()
         {
-            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 3, KlantNaam = "Barry Bart", Status = "Klaar", SubTotaal = 5.80 };
+            //Haal bestelling op uit database
+            List<PizzaOverviewViewModel> pizzaViewModels = new List<PizzaOverviewViewModel>();
+
+            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 1, Name = "Pizza Margarita", Price = 10.00m });
+            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 2, Name = "Pizza Tonno", Price = 12.50m });
+
+            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", SubTotaal = 12.50, Pizzas = pizzaViewModels };
+
+            CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel() { BestellingViewModel = bestellingViewModel, Pizzas = pizzaViewModels };
+            return createBestellingViewModel;
+        }
+
+        public ActionResult VoegToe(int bestellingId,int pizzaId)
+        {
+            //Todo: stap1 voeg pizza toe aan bestelling in database
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = "INSERT INTO bestelling ({PizzaID}) WHERE bestellingId = {id};";
+                    string query = $"INSERT {pizzaId} INTO bestelling{bestellingId}";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
-                        mySqlCommand.ExecuteNonQuery();
+                        MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
                     }
-                    return RedirectToAction(nameof(Index));
                 }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine("Network Error");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Inserting went wrong");
+                Console.WriteLine("Something went wrong adding pizza to order in database");
             }
-            return View(CreateBestelling);
+            return RedirectToAction("CreateBestelling", new { bestellingId });
         }
-        
     }
 }
