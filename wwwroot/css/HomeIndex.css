@@ -3,7 +3,7 @@
     margin: 0;
     height: 100vh;
     display: flex;
-
+    background-color: #3E3E3E;
 }
 
 .profile-container {
@@ -42,3 +42,4 @@
 .profile-button:hover {
     opacity: 0.7;
 }
+

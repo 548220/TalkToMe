@@ -130,7 +130,7 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = $"INSERT {pizzaId} INTO bestelling{bestellingId}";
+                    string query = $"INSERT Pizza{pizzaId} INTO bestelling{bestellingId}";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
                         MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
