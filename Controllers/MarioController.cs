@@ -103,6 +103,35 @@ namespace TalkToMeMario.Controllers
         {
             if (bestellingId==null)
             {
+                try
+                { 
+                    using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                    {
+                        mySqlConnection.Open();
+                        string query = "INSERT INTO Bestellingen (KlantNaam, Status, SubTotaal) VALUES (@KlantNaam, @Status, @SubTotaal);";
+                        using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                        {
+                            mySqlCommand.Parameters.AddWithValue("@Klantnaam", "Nieuwe klant");
+                            mySqlCommand.Parameters.AddWithValue("@Status", "Bezig");
+                            mySqlCommand.Parameters.AddWithValue("@SubTotaal", "0.00");
+
+                            mySqlCommand.ExecuteNonQuery();
+
+                            mySqlCommand.CommandText = "SELECT LAST_INSERT_ID();";
+                            bestellingId = Convert.ToInt32(mySqlCommand.ExecuteScalar());
+                        }
+                    
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine("Network error");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Something went wrong adding a new order");
+                }
+
                 //Todo: bepaal het nieuwe bestellingId
             }
             return View(GetBestellingDataFromDataBase());
@@ -124,7 +153,6 @@ namespace TalkToMeMario.Controllers
 
         public ActionResult VoegToe(int bestellingId,int pizzaId)
         {
-            //Todo: stap1 voeg pizza toe aan bestelling in database
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
