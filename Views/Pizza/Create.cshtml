@@ -20,7 +20,7 @@
         @Html.ValidationMessageFor(model => model.Price)
     </div>
 
-    <button type="submit" class="btn btn-primary">Opslaan</button>
+    <button type="submit" class="btn btn-primary" asp-controller="Pizza" asp-action="Create">Opslaan</button>
     <a href="@Url.Action("Index", "Pizza")" class="btn btn-secondary">Annuleren</a>
 }
 
