@@ -2,27 +2,43 @@
     ViewData["Title"] = "Home Page";
     Layout = null;
 }
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Profile Selection</title>
-    <link rel="stylesheet" type="text/css" href="~/css/HomeIndex.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Kiezer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/HomeIndex.css">
 </head>
 <body>
-    <div class="profile-container">
-        <a href="Mario" class="profile-button">
-            <img src="~/ImageFolder/mariopfp.png" alt="Mario" />
-            <span>Mario</span>
-        </a>
-        <a href="Luigi" class="profile-button">
-            <img src="~/ImageFolder/luigipfp.png" alt="Luigi" />
-            <span>Luigi</span>
-        </a>
-        <a href="Pizza" class="profile-button">
-            <img src="~/ImageFolder/professorpanucci.png" alt="professor" />
-            <span>Panucci</span>
-        </a>
-        
-    </div>
-</body>
+        <div class="container text-center">
+            <h1 class="mb-5">Kies een Pagina</h1>
+            <div class="row justify-content-center">
+                <!-- Pagina 1 -->
+                <div class="col-md-4 mb-4">
+                    <div class="profile-card" onclick="window.location.href='@Url.Action("Index", "Mario")'">
+                        <img src="~/ImageFolder/mariopfp.png" alt="Mario">
+                        <h5>Mario</h5>
+                    </div>
+                </div>
+                <!-- Pagina 2 -->
+                <div class="col-md-4 mb-4">
+                    <div class="profile-card" onclick="window.location.href='@Url.Action("Index", "Luigi")'">
+                        <img src="~/ImageFolder/luigipfp.png" alt="Luigi">
+                        <h5>Luigi</h5>
+                    </div>
+                </div>
+                <!-- Pagina 3 -->
+                <div class="col-md-4 mb-4">
+                    <div class="profile-card" onclick="window.location.href='@Url.Action("Index", "Pizza")'">
+                        <img src="~/ImageFolder/professorpanucci.png" alt="Panucci">
+                        <h5>Panucci</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>
+
