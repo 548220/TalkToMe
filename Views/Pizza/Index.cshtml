@@ -4,31 +4,59 @@
     ViewData["Title"] = "Pizza List";
 }
 
-<link rel="stylesheet" href="/css/pizzaIndex.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Overzicht</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
 
-<h1>Pizza List</h1>
 
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Naam</th>
-            <th>Prijs</th>
-            <th>Acties</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pizza in Model)
-        {
-            <tr>
-                <td>@pizza.Name</td>
-                <td>@pizza.Price</td>
-                <td>
-                    <a asp-controller="Pizza" asp-action="Edit" asp-route-id="@pizza.Id" class="btn btn-primary btn-sm">Edit</a>
-                    <a asp-controller="Pizza" asp-action="Delete" asp-route-id="@pizza.Id" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Pizza Overzicht</h1>
 
-<a asp-controller="Pizza" asp-action="Create" class="btn btn-primary btn-sm">Create New Pizza</a>
+        <!-- Create New Pizza Button -->
+        <div class="mb-3">
+            <a href="@Url.Action("Create", "Pizza")" class="btn btn-success">Create New Pizza</a>
+        </div>
+
+        <!-- Pizza List Table -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0">Beschikbare Pizza's</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Naam</th>
+                            <th scope="col">Prijs</th>
+                            <th scope="col">Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pizza in Model)
+                        {
+                            <tr>
+                                <td>@pizza.Id</td>
+                                <td>@pizza.Name</td>
+                                <td>@pizza.Price.ToString("C")</td>
+                                <td>
+                                    <a href="@Url.Action("Edit", "Pizza", new { id = pizza.Id })" class="btn btn-primary btn-sm">Edit</a>
+                                    <a href="@Url.Action("Delete", "Pizza", new { id = pizza.Id })" class="btn btn-danger btn-sm" onclick="return confirm('Weet je zeker dat je deze pizza wilt verwijderen?');">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

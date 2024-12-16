@@ -1,0 +1,73 @@
+﻿body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #333;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    background-color: #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    width: 150px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+    .card h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        font-weight: normal;
+    }
+
+.pizza-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+    .pizza-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+        .pizza-list li:last-child {
+            margin-bottom: 0;
+        }
+
+.button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #888;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+    .button:last-child {
+        margin-bottom: 0;
+    }
+
+    .button:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+    }
+
+.radio {
+    margin: 0;
+}

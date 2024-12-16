@@ -1,5 +1,28 @@
-﻿@{
+﻿@model IEnumerable<BestellingViewModel>
+
+@{
     ViewData["Title"] = "Luigi";
 }
 
-<h1> Dit is waar LUIGI zijn overzicht staat</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        @foreach (var bestelling in Model)
+        {
+            <div class="card">
+                <h3>@bestelling.KlantNaam<br>@bestelling.Status</h3>
+                <ul class="pizza-list">
+                    @foreach (var pizza in bestelling.Pizzas)
+                    {
+                        <li>@pizza.Name <input type="radio" class="radio" name="pizza_@bestelling.Id"></li>
+                    }
+                </ul>
+                <button class="button" onclick="startTimer('@bestelling.Id')">start timer @bestelling.Id</button>
+                <button class="button" disabled>Klaar</button>
+            </div>
+        }
+    </div>
+</body>
