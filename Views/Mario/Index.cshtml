@@ -1,5 +1,52 @@
-﻿@{
+﻿@model IEnumerable<BestellingOverViewViewModel>
+
+@{
     ViewData["Title"] = "Mario";
 }
+<link rel="stylesheet" href="/css/MarioBestelling.css">
 
-<h1>Dit is waar MARIO zijn overzicht staat </h1>
+<h1 class="title">Bestellingen</h1>
+<div class="outer-container">
+    <div class="left-container">
+        <div class="sidebar">
+            <ul>
+                @foreach (var bestelling in Model)
+                {
+                    <li class="bestelling">
+                        <a href="#" onclick="loadDetails(@bestelling.Id); return false;">
+                            @bestelling.KlantNaam
+                        </a>
+                        <p>@bestelling.Status</p>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="details" id="detailsPanel">
+            <h2>Selecteer een bestelling</h2>
+        </div>
+    </div>
+
+    <div class="right-container">
+        <h1>Tafels</h1>
+        <a asp-controller="Mario" asp-action="CreateBestelling" class="btn btn-primary btn-sm">Tafel 1</a>
+    </div>
+</div>
+
+<script>
+    function loadDetails(id) {
+        const detailsPane = document.getElementById("detailsPanel");
+        fetch(`/Mario/_bestellingsDetails/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then(html => {
+                detailsPane.innerHTML = html;
+            })
+            .catch(error => {
+                detailsPane.innerHTML = `<p>Error loading details: ${error.message}</p>`;
+            });
+    }
+</script>

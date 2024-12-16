@@ -1,0 +1,59 @@
+﻿@model TalkToMeMario.Models.CreateBestellingViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestelling Overzicht</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Bestelling Overzicht</h1>
+
+        <!-- Bestelling Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Bestelling van @Model.BestellingViewModel.KlantNaam</h3>
+                <p>Status: <strong>@Model.BestellingViewModel.Status</strong></p>
+            </div>
+            <div class="card-body">
+                <h5>Pizza's in Bestelling</h5>
+                <ul class="list-group">
+                    @foreach (var pizza in Model.BestellingViewModel.Pizzas)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@pizza.Name (@pizza.Price.ToString("C"))</span>
+                        </li>
+                    }
+                </ul>
+                <h5 class="mt-3">Subtotaal: @Model.BestellingViewModel.SubTotaal.ToString("C")</h5>
+            </div>
+        </div>
+
+        <!-- Overzicht van beschikbare pizza's -->
+        <h2>Beschikbare Pizza's</h2>
+        <div class="row">
+            @foreach (var pizza in Model.Pizzas)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@pizza.Name</h5>
+                            <p><strong>Prijs:</strong> @pizza.Price.ToString("C")</p>
+                            <form asp-action="VoegToe" asp-controller="Mario" method="post">
+                                <input type="hidden" name="bestellingId" value="@Model.BestellingViewModel.Id" />
+                                <input type="hidden" name="pizzaId" value="@pizza.Id" />
+                                <button type="submit" class="btn btn-primary">Voeg toe aan bestelling</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
