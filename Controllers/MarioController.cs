@@ -148,6 +148,9 @@ namespace TalkToMeMario.Controllers
 
             pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 1, Name = "Pizza Margarita", Price = 10.00m });
             pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 2, Name = "Pizza Tonno", Price = 12.50m });
+            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 3, Name = "Pizza Buffala", Price = 14.00m });
+            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 4, Name = "Pizza Parmaham", Price = 16.00m });
+            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 5, Name = "Pizza Ansjovis", Price = 13.00m });
 
             BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", SubTotaal = 12.50, Pizzas = pizzaViewModels };
 
