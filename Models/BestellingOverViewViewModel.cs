@@ -12,6 +12,9 @@ namespace TalkToMeMario.Models
         public string KlantNaam { get; set; }
 
         required
+        public string Tijd { get; set; }
+
+        required
         public string Status { get; set; }
 
         required

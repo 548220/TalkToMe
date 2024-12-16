@@ -15,8 +15,9 @@
                     <li class="bestelling">
                         <a href="#" onclick="loadDetails(@bestelling.Id); return false;">
                             @bestelling.KlantNaam
+                            @bestelling.Tijd
+                            <p>@bestelling.Status</p>
                         </a>
-                        <p>@bestelling.Status</p>
                     </li>
                 }
             </ul>
