@@ -75,7 +75,7 @@ namespace TalkToMeMario.Controllers
         // POST: PizzaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(string name, int price)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace TalkToMeMario.Controllers
                     using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                     {
                         mySqlConnection.Open();
-                        string query = "INSERT INTO pizza ({name}, {price}) VALUES ({name}, {price});";
+                        string query = $"INSERT INTO pizza ({name}, {price}) VALUES ({name}, {price});";
                         using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                         {
                             mySqlCommand.ExecuteNonQuery();
