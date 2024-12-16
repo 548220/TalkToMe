@@ -18,8 +18,10 @@ namespace TalkToMeMario.Controllers
         {
             List<BestellingOverViewViewModel> bestellingViewModels = new List<BestellingOverViewViewModel>();
 
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 1, KlantNaam = "Bertha Alkemade", Status = "Bezig", SubTotaal = 25.50 });
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 2, KlantNaam = "Floris Puts", Status = "Klaar", SubTotaal = 85.00 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 1, KlantNaam = "Bertha Alkemade", Tijd = "17.00", Status = "Bezig", SubTotaal = 25.50 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 2, KlantNaam = "Floris Puts", Tijd = "17.30", Status = "Klaar", SubTotaal = 85.00 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 3, KlantNaam = "Vince Schoutrop", Tijd = "17.45", Status = "Bezig", SubTotaal = 32.00 });
+            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 4, KlantNaam = "Alexander Vroemen", Tijd = "18.20", Status = "Bezig", SubTotaal = 23.00 });
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
@@ -35,8 +37,9 @@ namespace TalkToMeMario.Controllers
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
-                                    Status = mySqlDataReader.GetString(2),
-                                    SubTotaal = mySqlDataReader.GetDouble(3)
+                                    Tijd =  mySqlDataReader.GetString(2),
+                                    Status = mySqlDataReader.GetString(3),
+                                    SubTotaal = mySqlDataReader.GetDouble(4)
                                 });
                             }
                         }
@@ -73,8 +76,9 @@ namespace TalkToMeMario.Controllers
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
-                                    Status = mySqlDataReader.GetString(2),
-                                    SubTotaal = mySqlDataReader.GetDouble(3)
+                                    Tijd = mySqlDataReader.GetString(2),
+                                    Status = mySqlDataReader.GetString(3),
+                                    SubTotaal = mySqlDataReader.GetDouble(4)
                                 };
                             }
                         }

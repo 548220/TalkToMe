@@ -47,17 +47,20 @@
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    height: calc(100% - 60px);
+    height: calc(100% - 240px);
     overflow-y: auto;
 }
 
 .bestelling {
     color: #333;
     margin-bottom: 10px;
+    text-decoration: none;
+
 }
 
     .bestelling a {
         font-weight: bold;
+        text-decoration: none;
         color: #007bff;
     }
 
