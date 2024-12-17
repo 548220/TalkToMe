@@ -53,4 +53,39 @@
                 detailsPane.innerHTML = `<p>Error loading details: ${error.message}</p>`;
             });
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        function checkKlaarStatus() {
+            fetch('/Mario/CheckKlaarStatus')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.heeftKlaar) {
+                        showNotification();
+                    } else {
+                        hideNotification();
+                    }
+                })
+                .catch(error => console.error('Error bij het ophalen van status:', error));
+        }
+
+        function showNotification() {
+            let notification = document.getElementById("notification");
+            if (!notification) {
+                notification = document.createElement("div");
+                notification.id = "notification";
+                notification.className = "notification";
+                notification.innerHTML = "Je kunt een bestelling finaliseren";
+                document.body.appendChild(notification);
+            }
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById("notification");
+            if (notification) {
+                notification.remove();
+            }
+        }
+
+        setInterval(checkKlaarStatus, 5000);
+        });
 </script>

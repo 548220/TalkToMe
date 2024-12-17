@@ -182,5 +182,33 @@ namespace TalkToMeMario.Controllers
             }
             return RedirectToAction("CreateBestelling", new { bestellingId });
         }
+
+        public IActionResult CheckKlaarStatus()
+        {
+            bool heeftKlaarBestelling = false;
+            using MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring);
+            {
+                try
+                {
+                    mySqlConnection.Open();
+                    string query = "SELECT COUNT(1) FROM bestellingen WHERE Status = 'Klaar'";
+                    MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection);
+                    {
+                        int count = (int)mySqlCommand.ExecuteScalar();
+                        heeftKlaarBestelling = count > 0;
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine("Something went wrong");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Something went wrong");
+                }
+            }
+            return Json(new { heeftklaar = heeftKlaarBestelling });
+        }
+
     }
 }
