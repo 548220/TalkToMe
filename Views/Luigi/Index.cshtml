@@ -4,25 +4,60 @@
     ViewData["Title"] = "Luigi";
 }
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellingen Overzicht</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/LuigiIndex.css" >
 </head>
 <body>
     <div class="container">
-        @foreach (var bestelling in Model)
-        {
-            <div class="card">
-                <h3>@bestelling.KlantNaam<br>@bestelling.Status</h3>
-                <ul class="pizza-list">
-                    @foreach (var pizza in bestelling.Pizzas)
-                    {
-                        <li>@pizza.Name <input type="radio" class="radio" name="pizza_@bestelling.Id"></li>
-                    }
-                </ul>
-                <button class="button" onclick="startTimer('@bestelling.Id')">start timer @bestelling.Id</button>
-                <button class="button" disabled>Klaar</button>
-            </div>
-        }
+        <h1 class="mb-4 text-center">Bestellingen Overzicht</h1>
+
+        <!-- Bestellingen Grid -->
+        <div class="row g-4">
+            @foreach (var bestelling in Model)
+            {
+                <div class="col-md-4">
+                    <div class="order-card">
+                        <h5>@bestelling.KlantNaam</h5>
+                        <h5>@bestelling.Tijd</h5>
+                        <p><strong>Status:</strong> @bestelling.Status</p>
+                        <ul class="pizza-list">
+                            @foreach (var pizza in bestelling.Pizzas)
+                            {
+                                <li>
+                                    <span>@pizza.Name</span>
+                                    <input type="checkbox" class="pizza-checkbox" id="pizza @pizza.Name @bestelling.Id" onclick="markPizzaDone(this)">
+                                </li>
+                            }
+                        </ul>
+                        <button class="btn btn-primary btn-custom" onclick="startTimer('@bestelling.Id')">Start Timer @bestelling.Id</button>
+                        <button class="btn btn-secondary btn-custom">Klaar</button>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
+
+    <script>
+        function startTimer(bestellingId) {
+            alert('Timer gestart voor bestelling: ' + bestellingId);
+        }
+        function markPizzaDone(checkbox) {
+            if (checkbox.checked) {
+                checkbox.parentElement.style.textDecoration = "line-through";
+                checkbox.parentElement.style.color = "#6c757d"; // Grijze tekstkleur
+            } else {
+                checkbox.parentElement.style.textDecoration = "none";
+                checkbox.parentElement.style.color = "black";
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>

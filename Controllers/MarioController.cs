@@ -149,7 +149,7 @@ namespace TalkToMeMario.Controllers
             pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 1, Name = "Pizza Margarita", Price = 10.00m });
             pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 2, Name = "Pizza Tonno", Price = 12.50m });
 
-            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", SubTotaal = 12.50, Pizzas = pizzaViewModels };
+            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", Tijd = "17.00", SubTotaal = 12.50, Pizzas = pizzaViewModels };
 
             CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel() { BestellingViewModel = bestellingViewModel, Pizzas = pizzaViewModels };
             return createBestellingViewModel;

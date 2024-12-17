@@ -1,73 +1,43 @@
-﻿body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #333;
-    margin: 0;
-}
-
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
-
-.card {
-    background-color: #ccc;
-    padding: 20px;
-    border-radius: 10px;
-    width: 150px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+﻿.order-card {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    height: 100%;
 }
 
-    .card h3 {
-        margin: 0 0 10px;
-        font-size: 16px;
-        font-weight: normal;
+    .order-card:hover {
+        transform: translateY(-5px);
     }
 
 .pizza-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 20px;
+    margin: 0;
 }
 
     .pizza-list li {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin: 5px 0;
     }
 
-        .pizza-list li:last-child {
-            margin-bottom: 0;
-        }
-
-.button {
-    display: block;
+.btn-custom {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #888;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
+    margin-top: 10px;
 }
 
-    .button:last-child {
-        margin-bottom: 0;
-    }
+.container {
+    margin-top: 50px;
+}
 
-    .button:disabled {
-        background-color: #aaa;
-        cursor: not-allowed;
-    }
 
-.radio {
-    margin: 0;
+.pizza-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #198754; /* Bootstrap success kleur */
 }
