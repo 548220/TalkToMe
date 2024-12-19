@@ -16,8 +16,12 @@
             <h1>Creëer een nieuwe pizza</h1>
             <form asp-action="Create" asp-controller="pizza" method="post">
                 <div class="mb-3">
-                    <label for="Name" class="form-label">Pizza Naam</label>
-                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Voer de naam van de nieuwe pizza in" required/>
+                    <label for="Name" class="form-label">Product Naam</label>
+                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Voer de naam van het nieuwe product in" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="ProductCategory" class="form-label">Product Categorie</label>
+                    <input type="number" step="1" max="3" min="1" class="form-control" id="Category" name="Category" placeholder="Voer de categorie in" required />
                 </div>
                 <div class="mb-3">
                     <label for="Price" class="form-label">Prijs (€)</label>
@@ -25,7 +29,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="Description" class="form-label">Beschrijving</label>
-                    <textarea class="form-control" id="Description" name="Description" rows="4" placeholder="Voer een beschrijving van de pizza in"></textarea>
+                    <textarea class="form-control" id="Description" name="Description" rows="4" placeholder="Voer een beschrijving van het product in"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-between">
