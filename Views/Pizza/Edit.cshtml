@@ -1,36 +1,44 @@
 ﻿@{
     ViewData["Title"] = "Edit Pizza";
 }
-@model PizzaViewModel
+@model PizzaOverviewViewModel
 
-<h1>Edit Pizza</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/PizzaEdit.css">
+</head>
 
-@using (Html.BeginForm("Edit", "Pizza", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Edit Pizza</h1>
+            <form asp-action="Edit" asp-controller="Pizza" method="post">
+                <input type="hidden" id="Id" name="Id">
 
-    <br />
-    <div class="form-group">
-        <label for="Name">Naam</label>
-        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Name)
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Pizza Naam</label>
+                    <input type="text" class="form-control" id="Name" name="name" placeholder="Voer de nieuwe naam van de pizza in" required >
+                </div>
+
+                <div class="mb-3">
+                    <label for="Price" class="form-label">Nieuwe Prijs (€)</label>
+                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Voer de nieuwe prijs in" required >
+                </div>
+
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Beschrijving</label>
+                    <textarea class="form-control" id="Description" name="Description" rows="4" placeholder="Voer hier de nieuwe beschrijving in"></textarea> 
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-custom">Opslaan</button>
+                    <a href="@Url.Action("Index", "Pizza")" class="btn btn-secondary">Annuleren</a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <br /> 
-    <div class="form-group">
-        <label for="Price">Prijs</label>
-        @Html.TextBoxFor(model => model.Price, new { @class = "form-control", type = "number", step = "0.01" })
-        @Html.ValidationMessageFor(model => model.Price)
-    </div>
-
-    <br />
-    <div class="form-group">
-        <label for="Description">Beschrijving</label>
-        @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Description)
-    </div>
-    
-    <br />
-    <button type="submit" class="btn btn-primary">Opslaan</button>
-    <a href="@Url.Action("Index", "Pizza")" class="btn btn-secondary">Annuleren</a>
-}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
