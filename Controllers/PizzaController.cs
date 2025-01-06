@@ -84,7 +84,7 @@ namespace TalkToMeMario.Controllers
                     using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                     {
                         mySqlConnection.Open();
-                        string query = $"INSERT INTO pizza ({name}, {price}) VALUES ({name}, {price});";
+                        string query = $"INSERT INTO `product` (product_id, categorie_id, naam) VALUES (11, 1, 'Tonno');";
                         using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                         {
                             mySqlCommand.ExecuteNonQuery();
