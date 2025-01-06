@@ -75,7 +75,7 @@ namespace TalkToMeMario.Controllers
         // POST: PizzaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string name, int price)
+        public ActionResult Create(string name, int price, int category)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace TalkToMeMario.Controllers
                     using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                     {
                         mySqlConnection.Open();
-                        string query = $"INSERT INTO `product` (product_id, categorie_id, naam) VALUES (11, 1, 'Tonno');";
+                        string query = $"START TRANSACTION; INSERT INTO `product` (product_id, categorie_id, naam) VALUES (13, {category}, '{name}'); INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES (13, {price}, '2025-06-01'); COMMIT;";
                         using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                         {
                             mySqlCommand.ExecuteNonQuery();

@@ -17,15 +17,15 @@
             <form asp-action="Create" asp-controller="pizza" method="post">
                 <div class="mb-3">
                     <label for="Name" class="form-label">Product Naam</label>
-                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Voer de naam van het nieuwe product in" required/>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Voer de naam van het nieuwe product in" required/>
                 </div>
                 <div class="mb-3">
                     <label for="ProductCategory" class="form-label">Product Categorie</label>
-                    <input type="number" step="1" max="3" min="1" class="form-control" id="Category" name="Category" placeholder="Voer de categorie in" required />
+                    <input type="number" step="1" max="3" min="1" class="form-control" id="category" name="category" placeholder="Voer de categorie in" required />
                 </div>
                 <div class="mb-3">
                     <label for="Price" class="form-label">Prijs (€)</label>
-                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Voer de prijs in" required />
+                    <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Voer de prijs in" required />
                 </div>
                 <div class="mb-3">
                     <label for="Description" class="form-label">Beschrijving</label>
