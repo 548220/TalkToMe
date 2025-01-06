@@ -18,15 +18,15 @@ namespace TalkToMeMario.Controllers
         public ActionResult Index()
         {
             List<PizzaOverviewViewModel> pizzaViewModels = new List<PizzaOverviewViewModel>();
-
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 1, Name = "Pizza Margarita", Price = 10.00m });
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 2, Name = "Pizza Tonno", Price = 12.50m });
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                 {
                     mySqlConnection.Open();
-                    using (MySqlCommand mySqlCommand = new MySqlCommand("Select id,name,price FROM Pizza;", mySqlConnection))
+                    string query = @"SELECT p.product_id, p.naam, pp.prijs
+                                    FROM product p
+                                    INNER JOIN product_prijs pp ON p.product_id = pp.product_id;";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
                         using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
                         {
