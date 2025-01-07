@@ -103,6 +103,14 @@ namespace TalkToMeMario.Controllers
         // GET: PizzaController/Edit/5
         public ActionResult Edit(int id)
         {
+            try
+            {
+                PizzaOverviewViewModel pizza;
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                {
+
+                }
+            }
             return View();
         }
 
