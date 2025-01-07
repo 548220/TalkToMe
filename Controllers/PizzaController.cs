@@ -139,14 +139,32 @@ namespace TalkToMeMario.Controllers
                 {
                     mysqlconnection.Open();
 
-                    string query = $"DELETE FROM `product_prijs` WHERE product_id = {id}";
-                    using (MySqlCommand mysqlcommand = new MySqlCommand(query, mysqlconnection))
+                    using (MySqlTransaction mySqlTransaction = mysqlconnection.BeginTransaction())
                     {
-                        mysqlcommand.ExecuteNonQuery();
+                        try
+                        {
+                            string deleteProductPrijsQuery = $"DELETE FROM `product_prijs` WHERE product_id = {id}";
+                            using (MySqlCommand deleteProductPrijsCommand = new MySqlCommand(deleteProductPrijsQuery, mysqlconnection, mySqlTransaction))
+                            {
+                                deleteProductPrijsCommand.ExecuteNonQuery();
+                            }
+
+                            string deleteProductQuery = $"DELETE FROM `product` WHERE product_id = {id}";
+                            using (MySqlCommand deleteProductCommand = new MySqlCommand(deleteProductQuery, mysqlconnection, mySqlTransaction))
+                            {
+                                deleteProductCommand.ExecuteNonQuery();
+                            }
+
+                            mySqlTransaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            mySqlTransaction.Rollback();
+                            throw;
+                        }
                     }
                 }
-
-                return RedirectToAction("Index"); // Terug naar de lijstpagina
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
