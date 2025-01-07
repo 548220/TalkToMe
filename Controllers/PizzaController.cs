@@ -133,7 +133,26 @@ namespace TalkToMeMario.Controllers
         // GET: PizzaController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            try
+            {
+                using (MySqlConnection mysqlconnection = new MySqlConnection(_connectionString))
+                {
+                    mysqlconnection.Open();
+
+                    string query = $"DELETE FROM `product_prijs` WHERE product_id = {id}";
+                    using (MySqlCommand mysqlcommand = new MySqlCommand(query, mysqlconnection))
+                    {
+                        mysqlcommand.ExecuteNonQuery();
+                    }
+                }
+
+                return RedirectToAction("Index"); // Terug naar de lijstpagina
+            }
+            catch (Exception ex)
+            {
+                // Voeg foutafhandeling toe indien nodig
+                return RedirectToAction("Index");
+            }
         }
 
         // POST: PizzaController/Delete/5
