@@ -15,21 +15,21 @@
         <div class="form-container">
             <h1>Edit Pizza</h1>
             <form asp-action="Edit" asp-controller="Pizza" method="post">
-                <input type="hidden" id="Id" name="Id">
+                <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
                 <div class="mb-3">
                     <label for="Name" class="form-label">Pizza Naam</label>
-                    <input type="text" class="form-control" id="Name" name="name" placeholder="Voer de nieuwe naam van de pizza in" required >
+                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Voer de nieuwe naam van de pizza in" value="@Model.Name" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="Price" class="form-label">Nieuwe Prijs (€)</label>
-                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Voer de nieuwe prijs in" required >
+                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Voer de nieuwe prijs in" value="@Model.Price" required>
                 </div>
 
                 <div class="mb-3">
-                    <label for="Description" class="form-label">Beschrijving</label>
-                    <textarea class="form-control" id="Description" name="Description" rows="4" placeholder="Voer hier de nieuwe beschrijving in"></textarea> 
+                    <label for="Category" class="form-label">Categorie</label>
+                    <input type="number" step="1" class="form-control" id="CategoryId" name="CategoryId" placeholder="Voer hier de nieuwe Categorie in" value="@Model.CategoryId" required>
                 </div>
 
                 <div class="d-flex justify-content-between">

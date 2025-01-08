@@ -101,6 +101,8 @@ namespace TalkToMeMario.Controllers
         }
 
         // GET: PizzaController/Edit/5
+
+        // TODO: prijs nog bij
         public ActionResult Edit(int id)
         {
             try
@@ -108,33 +110,60 @@ namespace TalkToMeMario.Controllers
                 PizzaOverviewViewModel pizza;
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                 {
+                    mySqlConnection.Open();
 
+                    string query = $"SELECT p.product_id, p.naam, pp.prijs, p.categorie_id FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id WHERE p.product_id = {id}";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        using (var reader = mySqlCommand.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                pizza = new PizzaOverviewViewModel
+                                {
+                                    Id = reader.GetInt32("product_id"),
+                                    Name = reader.GetString("naam"),
+                                    Price = reader.GetDecimal("prijs"),
+                                    CategoryId = reader.GetInt32("categorie_id"),
+                                };
+                            }
+                            else
+                            {
+                                return NotFound();
+                            }
+                        }
+                    }
                 }
+                return View(pizza);
             }
-            return View();
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
         }
 
         // POST: PizzaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(PizzaOverviewViewModel model)
         {
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                 {
                     mySqlConnection.Open();
-                    string query = $"UPDATE pizza SET name = naam, price = prijs, description = lekker WHERE id= {id}";
+
+                    string query = $"UPDATE `product` SET Naam = '{model.Name}', categorie_id = '{model.CategoryId}' WHERE product_id = {model.Id}";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
                         mySqlCommand.ExecuteNonQuery();
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(model);
             }
         }
 
