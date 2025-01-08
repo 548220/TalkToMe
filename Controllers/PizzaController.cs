@@ -75,10 +75,10 @@ namespace TalkToMeMario.Controllers
         // POST: PizzaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string name, int price, int category)
+        public ActionResult Create(string name, decimal price, int category)
         {
-            if (ModelState.IsValid)
-            {
+           // if (ModelState.IsValid)
+           // {
                 try
                 {
                     using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
@@ -96,7 +96,7 @@ namespace TalkToMeMario.Controllers
                 {
                     
                 }
-            }
+           // }
             return View();
         }
 
@@ -160,7 +160,7 @@ namespace TalkToMeMario.Controllers
                         productCommand.ExecuteNonQuery();
                     }
 
-                    string priceQuery = $"UPDATE `product_price` SET prijs = {model.Price} WHERE product_id = {model.Id}";
+                    string priceQuery = $"UPDATE `product_prijs` SET prijs = {model.Price} WHERE product_id = {model.Id}";
                     using (MySqlCommand priceCommand = new MySqlCommand(priceQuery, mySqlConnection))
                     {
                         priceCommand.ExecuteNonQuery();
