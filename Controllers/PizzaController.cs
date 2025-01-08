@@ -126,6 +126,7 @@ namespace TalkToMeMario.Controllers
                                     Price = reader.GetDecimal("prijs"),
                                     CategoryId = reader.GetInt32("categorie_id"),
                                 };
+                                Console.WriteLine($"product_id: {reader["product_id"]}, Naam: {reader["naam"]}, Prijs: {reader["prijs"]}, Categorie: {reader["categorie_id"]}");
                             }
                             else
                             {
@@ -153,10 +154,16 @@ namespace TalkToMeMario.Controllers
                 {
                     mySqlConnection.Open();
 
-                    string query = $"UPDATE `product` SET Naam = '{model.Name}', categorie_id = '{model.CategoryId}' WHERE product_id = {model.Id}";
-                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    string productQuery = $"UPDATE `product` SET Naam = '{model.Name}', categorie_id = '{model.CategoryId}' WHERE product_id = {model.Id}";
+                    using (MySqlCommand productCommand = new MySqlCommand(productQuery, mySqlConnection))
                     {
-                        mySqlCommand.ExecuteNonQuery();
+                        productCommand.ExecuteNonQuery();
+                    }
+
+                    string priceQuery = $"UPDATE `product_price` SET prijs = {model.Price} WHERE product_id = {model.Id}";
+                    using (MySqlCommand priceCommand = new MySqlCommand(priceQuery, mySqlConnection))
+                    {
+                        priceCommand.ExecuteNonQuery();
                     }
                 }
                 return RedirectToAction("Index");
