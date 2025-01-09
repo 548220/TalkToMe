@@ -18,16 +18,13 @@ namespace TalkToMeMario.Controllers
         {
             List<BestellingOverViewViewModel> bestellingViewModels = new List<BestellingOverViewViewModel>();
 
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 1, KlantNaam = "Bertha Alkemade", Tijd = "17.00", Status = "Bezig", SubTotaal = 25.50 });
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 2, KlantNaam = "Floris Puts", Tijd = "17.30", Status = "Klaar", SubTotaal = 85.00 });
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 3, KlantNaam = "Vince Schoutrop", Tijd = "17.45", Status = "Bezig", SubTotaal = 32.00 });
-            bestellingViewModels.Add(new BestellingOverViewViewModel() { Id = 4, KlantNaam = "Alexander Vroemen", Tijd = "18.20", Status = "Bezig", SubTotaal = 23.00 });
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    using (MySqlCommand mySqlCommand = new MySqlCommand("SELECT id, status, subtotaal FROM bestellingen;", mySqlConnection))
+                    string query = "SELECT b.bestel_id, k.naam AS klant_naam, b.datum AS tijd, s.statusOmschrijving AS status FROM bestelling b JOIN klant k ON b.klant_id = k.klant_id JOIN bestel_regel br ON b.bestel_id = br.bestel_id JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id JOIN status s ON ps.status_id = s.status_id;";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
                         using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
                         {
@@ -37,9 +34,8 @@ namespace TalkToMeMario.Controllers
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
-                                    Tijd =  mySqlDataReader.GetString(2),
-                                    Status = mySqlDataReader.GetString(3),
-                                    SubTotaal = mySqlDataReader.GetDouble(4)
+                                    Tijd =  mySqlDataReader.GetDateTime(2),
+                                    Status = mySqlDataReader.GetString(3)
                                 });
                             }
                         }
@@ -76,7 +72,7 @@ namespace TalkToMeMario.Controllers
                                 {
                                     Id = mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
-                                    Tijd = mySqlDataReader.GetString(2),
+                                    Tijd = mySqlDataReader.GetDateTime(2),
                                     Status = mySqlDataReader.GetString(3),
                                     SubTotaal = mySqlDataReader.GetDouble(4)
                                 };
@@ -146,11 +142,33 @@ namespace TalkToMeMario.Controllers
             //Haal bestelling op uit database
             List<PizzaOverviewViewModel> pizzaViewModels = new List<PizzaOverviewViewModel>();
 
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 1, Name = "Pizza Margarita", Price = 10.00m });
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 2, Name = "Pizza Tonno", Price = 12.50m });
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 3, Name = "Pizza Buffala", Price = 14.00m });
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 4, Name = "Pizza Parmaham", Price = 16.00m });
-            pizzaViewModels.Add(new PizzaOverviewViewModel() { Id = 5, Name = "Pizza Ansjovis", Price = 13.00m });
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string query = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id;";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        using (MySqlDataReader reader = mySqlCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                pizzaViewModels.Add(new PizzaOverviewViewModel()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Price = reader.GetDecimal(2)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
 
             BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", Tijd = "17.00", SubTotaal = 12.50, Pizzas = pizzaViewModels };
 
@@ -191,7 +209,7 @@ namespace TalkToMeMario.Controllers
                 try
                 {
                     mySqlConnection.Open();
-                    string query = "SELECT COUNT(1) FROM bestellingen WHERE Status = 'Klaar'";
+                    string query = "SELECT COUNT(1) FROM pizza_status WHERE status_id = 1";
                     MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection);
                     {
                         int count = (int)mySqlCommand.ExecuteScalar();

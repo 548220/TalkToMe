@@ -12,12 +12,12 @@ namespace TalkToMeMario.Models
         public string KlantNaam { get; set; }
 
         required
-        public string Tijd { get; set; }
+        public DateTime Tijd { get; set; }
 
         required
         public string Status { get; set; }
 
-        required
+        
         public double SubTotaal { get; set; }
 
     }
