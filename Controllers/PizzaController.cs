@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using TalkToMeMario.Models;
 using Microsoft.VisualBasic;
 using System.Runtime.InteropServices;
+using System.Transactions;
 
 namespace TalkToMeMario.Controllers
 {
@@ -77,27 +78,51 @@ namespace TalkToMeMario.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(string name, decimal price, int category)
         {
-           // if (ModelState.IsValid)
-           // {
-                try
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                 {
-                    using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                    mySqlConnection.Open();
+
+                    using (MySqlTransaction mySqlTransaction = mySqlConnection.BeginTransaction())
                     {
-                        mySqlConnection.Open();
-                        string query = $"START TRANSACTION; INSERT INTO `product` (product_id, categorie_id, naam) VALUES (13, {category}, '{name}'); INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES (13, {price}, '2025-06-01'); COMMIT;";
-                        using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                        try
                         {
-                            mySqlCommand.ExecuteNonQuery();
+                            string insertProductQuery = $"INSERT INTO `product` (categorie_id, naam) VALUES ({category}, {name})";
+                            using (MySqlCommand mySqlCommand = new MySqlCommand(insertProductQuery, mySqlConnection, mySqlTransaction))
+                            {
+                                mySqlCommand.ExecuteNonQuery();
+                            }
+
+                            string getLastInsertIdQuery = "SELECT LAST_INSERT_ID();";
+                            long productId;
+                            using (MySqlCommand getLastInsertIdCommand = new MySqlCommand(getLastInsertIdQuery, mySqlConnection))
+                            {
+                                productId = Convert.ToInt64(getLastInsertIdCommand.ExecuteScalar());
+                            }
+
+                            string insertPriceQuery = $"INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES ({productId}, {price}, '2023-11-12');";
+                            using (MySqlCommand insertPriceCommand = new MySqlCommand(insertPriceQuery, mySqlConnection, mySqlTransaction))
+                            {
+                                insertPriceCommand.ExecuteNonQuery();
+                            }
+
+                            mySqlTransaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Something went wrong");
                         }
                     }
-                    return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
-                {
-                    
-                }
-           // }
-            return View();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return View();
+            }
+            
         }
 
         // GET: PizzaController/Edit/5
@@ -125,12 +150,11 @@ namespace TalkToMeMario.Controllers
                                     Name = reader.GetString("naam"),
                                     Price = reader.GetDecimal("prijs"),
                                     CategoryId = reader.GetInt32("categorie_id"),
-                                };
-                                Console.WriteLine($"product_id: {reader["product_id"]}, Naam: {reader["naam"]}, Prijs: {reader["prijs"]}, Categorie: {reader["categorie_id"]}");
+                                };                              
                             }
                             else
                             {
-                                return NotFound();
+                                return View();
                             }
                         }
                     }
@@ -160,9 +184,13 @@ namespace TalkToMeMario.Controllers
                         productCommand.ExecuteNonQuery();
                     }
 
-                    string priceQuery = $"UPDATE `product_prijs` SET prijs = {model.Price} WHERE product_id = {model.Id}";
+                    //todo: fix price 
+                    decimal priceFix = model.Price / 100;
+                    string priceQuery = $"UPDATE `product_prijs` SET prijs = @prijs WHERE product_id = @product_id";
                     using (MySqlCommand priceCommand = new MySqlCommand(priceQuery, mySqlConnection))
                     {
+                        priceCommand.Parameters.AddWithValue("@prijs", priceFix);
+                        priceCommand.Parameters.AddWithValue("@product_id", model.Id);
                         priceCommand.ExecuteNonQuery();
                     }
                 }

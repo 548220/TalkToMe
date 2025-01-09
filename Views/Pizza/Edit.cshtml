@@ -24,7 +24,10 @@
 
                 <div class="mb-3">
                     <label for="Price" class="form-label">Nieuwe Prijs (€)</label>
-                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Voer de nieuwe prijs in" value="@Model.Price" required>
+                    <input type="number" class="form-control" id="Price" name="Price"
+                           placeholder="Voer de nieuwe prijs in"
+                           value="@Model.Price.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                           step="0.01" required>
                 </div>
 
                 <div class="mb-3">
