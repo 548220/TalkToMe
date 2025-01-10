@@ -12,12 +12,12 @@
             public string Status { get; set; }
         
         required
-            public string Tijd { get; set; }
-
-        
-            public List<PizzaOverviewViewModel> Pizzas { get; set; }
+            public DateTime Tijd { get; set; }
 
         required
+            public List<PizzaOverviewViewModel> Pizzas { get; set; } = new List<PizzaOverviewViewModel>();
+
+        
             public double SubTotaal { get; set; }
     }
 }

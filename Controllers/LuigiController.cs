@@ -60,15 +60,20 @@ namespace TalkToMeMario.Controllers
                 {
                     mySqlConnection.Open();
                     string bestellingQuery = @"SELECT 
-                                               b.bestel_id AS Id,
-                                               K.naam AS KlantNaam,
-                                               bs.status AS Status,
-                                               p.bedrag AS Subtotaal,
-                                               p.created_at AS tijd
-                                               FROM bestelling b
-                                               JOIN klant k ON b.klant_id = k.klant_id
-                                               JOIN betaling p ON b.bestel_id = p.bestel_id
-                                               JOIN betaal_status bs ON p.betaalstatus_id = bs.betaalstatus_id;";
+                                               b.bestel_id,
+                                               k.naam AS klant_naam,
+                                               b.datum AS tijd,
+                                               s.statusOmschrijving AS status
+                                               FROM 
+                                               bestelling b
+                                               JOIN 
+                                               klant k ON b.klant_id = k.klant_id
+                                               JOIN 
+                                               bestel_regel br ON b.bestel_id = br.bestel_id
+                                               JOIN 
+                                               pizza_status ps ON br.bestelregel_id = ps.bestelregel_id
+                                               JOIN 
+                                               status s ON ps.status_id = s.status_id;";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(bestellingQuery, mySqlConnection))
                     {
                         using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
@@ -77,11 +82,11 @@ namespace TalkToMeMario.Controllers
                             {
                                 bestellingViewModels.Add(new BestellingViewModel()
                                 {
-                                    Id=mySqlDataReader.GetInt32(0),
+                                    Id= mySqlDataReader.GetInt32(0),
                                     KlantNaam = mySqlDataReader.GetString(1),
-                                    Status = mySqlDataReader.GetString(2),
-                                    SubTotaal = mySqlDataReader.GetDouble(3),
-                                    Tijd = mySqlDataReader.GetString(4)
+                                    Tijd = mySqlDataReader.GetDateTime(2),
+                                    Status = mySqlDataReader.GetString(3),
+                                    Pizzas = pizzas
                                 });
                             }
                         }
@@ -96,8 +101,9 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine(ex.Message);
             }
-            bestellingViewModels.Add(new BestellingViewModel(){Id = 1, KlantNaam = "Bert", Tijd = "17.00", Pizzas = pizzas, Status= "klaar", SubTotaal = 12.50 });
-            bestellingViewModels.Add(new BestellingViewModel(){Id = 2, KlantNaam = "Jan", Tijd = "17.30", Pizzas = pizzas, Status = "bezig", SubTotaal = 35.80 });
+            DateTime huidigeDateTime = DateTime.Now;
+            bestellingViewModels.Add(new BestellingViewModel(){Id = 1, KlantNaam = "Bert", Tijd = huidigeDateTime, Pizzas = pizzas, Status= "klaar", SubTotaal = 12.50 });
+            bestellingViewModels.Add(new BestellingViewModel(){Id = 2, KlantNaam = "Jan", Tijd = huidigeDateTime, Pizzas = pizzas, Status = "bezig", SubTotaal = 35.80 });
 
             return View(bestellingViewModels);
         }
