@@ -23,7 +23,17 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = "SELECT b.bestel_id, k.naam AS klant_naam, b.datum AS tijd, s.statusOmschrijving AS status FROM bestelling b JOIN klant k ON b.klant_id = k.klant_id JOIN bestel_regel br ON b.bestel_id = br.bestel_id JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id JOIN status s ON ps.status_id = s.status_id;";
+                    string query = @"SELECT 
+                                     b.bestel_id, 
+                                     k.naam AS klant_naam, 
+                                     b.datum AS tijd, 
+                                     s.statusOmschrijving AS status 
+                                     FROM bestelling b 
+                                     JOIN klant k ON b.klant_id = k.klant_id 
+                                     JOIN bestel_regel br ON b.bestel_id = br.bestel_id 
+                                     JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id 
+                                     JOIN status s ON ps.status_id = s.status_id 
+                                     ORDER BY b.datum ASC;";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
                         using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
