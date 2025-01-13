@@ -39,5 +39,16 @@
 .pizza-checkbox {
     width: 20px;
     height: 20px;
-    accent-color: #198754; /* Bootstrap success kleur */
+    accent-color: #198754;
+}
+
+.timer-display {
+    font-size: 1em;
+    color: #007bff;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.timer-display[data-running="true"] {
+    color: #dc3545;
 }

@@ -31,12 +31,13 @@
                             {
                                 <li>
                                     <span>@pizza.Name</span>
-                                    <input type="checkbox" class="pizza-checkbox" id="pizza @pizza.Name @bestelling.Id" onclick="markPizzaDone(this)">
+                                    <input type="checkbox" class="pizza-checkbox" id="pizza-@pizza.Name.Replace(" ", "-")-@bestelling.Id" onclick="markPizzaDone(this)">
+                                    <button class="btn btn-primary btn-sm" onclick="startPizzaTimer('@pizza.Name.Replace("'", "\\'")', '@bestelling.Id')">Start Timer</button>
+                                    <span id="timer-@pizza.Name.Replace(" ", "-")-@bestelling.Id" class="timer-display" data-running="false">2:30</span>
                                 </li>
                             }
                         </ul>
-                        <button class="btn btn-primary btn-custom" onclick="startTimer('@bestelling.Id')">Start Timer @bestelling.Id</button>
-                        <button class="btn btn-secondary btn-custom">Klaar</button>
+                         <button class="btn btn-secondary btn-custom">Klaar</button> 
                     </div>
                 </div>
             }
@@ -44,9 +45,40 @@
     </div>
 
     <script>
-        function startTimer(bestellingId) {
-            alert('Timer gestart voor bestelling: ' + bestellingId);
+        function startPizzaTimer(pizzaName, bestellingId) { 
+            console.log("Pizza name:", pizzaName);
+            console.log("Bestelling ID:", bestellingId);
+            const timerElement = document.getElementById(`timer-${pizzaName.replace(' ', '-')}-${bestellingId}`);
+            let timeLeft = 150; // 2,5 minuten in seconden
+
+            // Controleer of er al een timer loopt
+            if (timerElement.dataset.running === "true") {
+                alert("De timer voor deze pizza loopt al!");
+                return;
+            }
+
+            // Markeer de timer als actief
+            timerElement.dataset.running = "true";
+
+            // Start de timer
+            const interval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                // Update de DOM
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval); // Stop de timer
+                    timerElement.textContent = "Klaar!";
+                    alert(`Timer voor pizza ${pizzaName} in bestelling ${bestellingId} is klaar!`);
+                    timerElement.dataset.running = "false"; // Markeer als voltooid
+                }
+
+                timeLeft--;
+            }, 1000);
         }
+
         function markPizzaDone(checkbox) {
             if (checkbox.checked) {
                 checkbox.parentElement.style.textDecoration = "line-through";
