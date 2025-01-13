@@ -17,7 +17,6 @@
     <div class="container">
         <h1 class="mb-4 text-center">Bestellingen Overzicht</h1>
 
-        <!-- Bestellingen Grid -->
         <div class="row g-4">
             @foreach (var bestelling in Model)
             {
@@ -37,7 +36,7 @@
                                 </li>
                             }
                         </ul>
-                         <button class="btn btn-secondary btn-custom">Klaar</button> 
+                        <a href="@Url.Action("BestellingFinaliseren", "Luigi", new { id = bestelling.Id })" class="btn btn-secondary btn-custom">Klaar</a>
                     </div>
                 </div>
             }
@@ -49,30 +48,26 @@
             console.log("Pizza name:", pizzaName);
             console.log("Bestelling ID:", bestellingId);
             const timerElement = document.getElementById(`timer-${pizzaName.replace(' ', '-')}-${bestellingId}`);
-            let timeLeft = 150; // 2,5 minuten in seconden
+            let timeLeft = 150; 
 
-            // Controleer of er al een timer loopt
             if (timerElement.dataset.running === "true") {
                 alert("De timer voor deze pizza loopt al!");
                 return;
             }
 
-            // Markeer de timer als actief
             timerElement.dataset.running = "true";
 
-            // Start de timer
             const interval = setInterval(() => {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
 
-                // Update de DOM
                 timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
                 if (timeLeft <= 0) {
-                    clearInterval(interval); // Stop de timer
+                    clearInterval(interval);
                     timerElement.textContent = "Klaar!";
                     alert(`Timer voor pizza ${pizzaName} in bestelling ${bestellingId} is klaar!`);
-                    timerElement.dataset.running = "false"; // Markeer als voltooid
+                    timerElement.dataset.running = "false";
                 }
 
                 timeLeft--;
@@ -82,7 +77,7 @@
         function markPizzaDone(checkbox) {
             if (checkbox.checked) {
                 checkbox.parentElement.style.textDecoration = "line-through";
-                checkbox.parentElement.style.color = "#6c757d"; // Grijze tekstkleur
+                checkbox.parentElement.style.color = "#6c757d";
             } else {
                 checkbox.parentElement.style.textDecoration = "none";
                 checkbox.parentElement.style.color = "black";
