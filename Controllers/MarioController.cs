@@ -324,6 +324,37 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine(ex.Message);
             }
+
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string insertKlantQuery = @"INSERT INTO klant (naam, telefoonnummer) VALUES ('', '')";
+                    using (MySqlCommand insertKlantCommand = new MySqlCommand(insertKlantQuery, mySqlConnection))
+                    {
+                        insertKlantCommand.ExecuteNonQuery();
+                    }
+
+                    string getKlantIdQuery = "SELECT LAST_INSERT_ID()";
+                    int klantId = 0;
+                    using (MySqlCommand getKlantIdCommand = new MySqlCommand(getKlantIdQuery, mySqlConnection))
+                    { 
+                        klantId = Convert.ToInt32(getKlantIdCommand.ExecuteScalar());
+                    }
+
+                    string insertBestellingQuery = "INSERT INTO bestelling (klant_id, datum) VALUES (@klantId, NOW())";
+                    using (MySqlCommand insertBestellingCommand = new MySqlCommand(insertBestellingQuery, mySqlConnection))
+                    {
+                        insertBestellingCommand.Parameters.AddWithValue("@klantId", klantId);
+                        insertBestellingCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Something went wrong adding new user + order");
+            }
             BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", Tijd = "17.00", SubTotaal = 12.50, Pizzas = pizzas };
 
             CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel() { BestellingViewModel = bestellingViewModel, Pizzas = pizzas };
