@@ -63,53 +63,108 @@ namespace TalkToMeMario.Controllers
             return View(bestellingViewModels);
         }
 
-        public ActionResult details(int id)
+        [HttpGet]
+        public IActionResult GetBestellingDetails(int id)
         {
-            BestellingOverViewViewModel bestelling = null;
-
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    using (MySqlCommand mySqlCommand = new MySqlCommand($"SELECT id, klantnaam, status, subtotaal FROM bestellingen WHERE id = {id}", mySqlConnection))
+                    string query = $@"SELECT 
+                                     p.product_id, 
+                                     p.naam AS pizza_naam, 
+                                     pp.prijs AS pizza_prijs, 
+                                     br.aantal 
+                                     FROM bestel_regel br 
+                                     JOIN product p ON br.product_id = p.product_id 
+                                     JOIN product_prijs pp ON p.product_id = pp.product_id 
+                                     WHERE br.bestel_id = {id}";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
-                        using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
+                        mySqlCommand.Parameters.AddWithValue("@bestlId", id);
+                        using (MySqlDataReader reader = mySqlCommand.ExecuteReader())
                         {
-                            if (mySqlDataReader.Read())
+                            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();
+                            decimal subtotaal = 0;
+
+                            while (reader.Read())
                             {
-                                bestelling = new BestellingOverViewViewModel()
+                                decimal prijs = reader.GetDecimal(2);
+                                int aantal = reader.GetInt32(3);
+                                subtotaal += prijs * aantal;
+
+                                pizzas.Add(new PizzaOverviewViewModel
                                 {
-                                    Id = mySqlDataReader.GetInt32(0),
-                                    KlantNaam = mySqlDataReader.GetString(1),
-                                    Tijd = mySqlDataReader.GetDateTime(2),
-                                    Status = mySqlDataReader.GetString(3),
-                                    SubTotaal = mySqlDataReader.GetDouble(4)
-                                };
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Price = prijs
+                                });
                             }
+
+                            return Json(new
+                            {
+                                pizzas,
+                                subtotaal
+                            });
                         }
                     }
                 }
             }
-            catch (MySqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
             catch (Exception ex)
             {
-                Console.WriteLine("jammer");
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "Fout bij het ophalen van bestellingsdetails.");
             }
-
-            if (bestelling == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("_BestellingDetails", bestelling);
         }
 
-        public ActionResult CreateBestelling(int? bestellingId)
+        //public ActionResult details(int id)
+        //{
+        //    BestellingOverViewViewModel bestelling = null;
+
+        //    try
+        //    {
+        //        using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+        //        {
+        //            mySqlConnection.Open();
+        //            using (MySqlCommand mySqlCommand = new MySqlCommand($"SELECT id, klantnaam, status, subtotaal FROM bestellingen WHERE id = {id}", mySqlConnection))
+        //            {
+        //                using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
+        //                {
+        //                    if (mySqlDataReader.Read())
+        //                    {
+        //                        bestelling = new BestellingOverViewViewModel()
+        //                        {
+        //                            Id = mySqlDataReader.GetInt32(0),
+        //                            KlantNaam = mySqlDataReader.GetString(1),
+        //                            Tijd = mySqlDataReader.GetDateTime(2),
+        //                            Status = mySqlDataReader.GetString(3),
+        //                            SubTotaal = mySqlDataReader.GetDouble(4)
+        //                        };
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (MySqlException ex)
+        //    {
+        //        Console.WriteLine(ex.Message);
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("jammer");
+        //    }
+
+        //    if (bestelling == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return PartialView("_BestellingDetails", bestelling);
+        //}
+
+        public ActionResult CreateBestellingTafel(int? bestellingId)
         {
             if (bestellingId==null)
             {
@@ -180,6 +235,7 @@ namespace TalkToMeMario.Controllers
                 Console.WriteLine(ex.ToString());
             }
 
+            
             BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", Tijd = "17.00", SubTotaal = 12.50, Pizzas = pizzaViewModels };
 
             CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel() { BestellingViewModel = bestellingViewModel, Pizzas = pizzaViewModels };
@@ -208,7 +264,7 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine("Something went wrong adding pizza to order in database");
             }
-            return RedirectToAction("CreateBestelling", new { bestellingId });
+            return RedirectToAction("CreateBestellingTafel", new { bestellingId });
         }
 
         public IActionResult CheckKlaarStatus()
@@ -238,5 +294,40 @@ namespace TalkToMeMario.Controllers
             return Json(new { heeftklaar = heeftKlaarBestelling });
         }
 
+        public ActionResult CreateBestellingKlant()
+        {
+            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string query = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id;";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        using (MySqlDataReader reader = mySqlCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                pizzas.Add(new PizzaOverviewViewModel
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Price = reader.GetDecimal(2)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            BestellingViewModel bestellingViewModel = new BestellingViewModel() { Id = 1, KlantNaam = "Bert", Status = "Bezig", Tijd = "17.00", SubTotaal = 12.50, Pizzas = pizzas };
+
+            CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel() { BestellingViewModel = bestellingViewModel, Pizzas = pizzas };
+            return View(createBestellingViewModel);
+        }
     }
 }

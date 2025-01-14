@@ -16,7 +16,7 @@
                 @foreach (var bestelling in Model)
                 {
                     <li class="bestelling">
-                        <a href="#" onclick="loadDetails(@bestelling.Id); return false;">
+                        <a href="#" onclick="details(@bestelling.Id); return false;">
                             @bestelling.KlantNaam
                             @bestelling.Tijd
                             <p>@bestelling.Status</p>
@@ -36,23 +36,45 @@
     </div>
 </div>
 
+<div class="fab-container">
+    <a asp-controller="Mario" asp-action="CreateBestellingKlant" class="fab btn btn-primary" aria-label="Nieuwe bestelling aanmaken">
+        +
+    </a>
+</div>
+
 <script>
-    function loadDetails(id) {
-        const detailsPane = document.getElementById("detailsPanel");
-        fetch(`/Mario/_bestellingsDetails/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.text();
-            })
-            .then(html => {
-                detailsPane.innerHTML = html;
-            })
-            .catch(error => {
-                detailsPane.innerHTML = `<p>Error loading details: ${error.message}</p>`;
-            });
-    }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        function details(bestelId) {
+            fetch(`/Mario/GetBestellingDetails?id=${bestelId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const detailsPanel = document.getElementById("detailsPanel");
+                    if (data && data.pizzas) {
+                        let pizzasHtml = data.pizzas.map(pizza => `
+                            <li>
+                                ${pizza.Name} - €${pizza.Price.toFixed(2)}
+                            </li>
+                        `).join("");
+
+                        detailsPanel.innerHTML = `
+                            <h2>Bestelling Details</h2>
+                            <ul>${pizzasHtml}</ul>
+                            <p><strong>Subtotaal:</strong> €${data.subtotaal.toFixed(2)}</p>
+                        `;
+                    } else {
+                        detailsPanel.innerHTML = "<h2>Geen details gevonden voor deze bestelling.</h2>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Fout bij ophalen van details:", error);
+                    const detailsPanel = document.getElementById("detailsPanel");
+                    detailsPanel.innerHTML = "<h2>Fout bij ophalen van details.</h2>";
+                });
+        }
+
+        window.details = details; // Zorg dat de functie beschikbaar is in de globale scope
+    });
 
     document.addEventListener("DOMContentLoaded", function () {
         function checkKlaarStatus() {
