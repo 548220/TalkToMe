@@ -300,7 +300,7 @@ namespace TalkToMeMario.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding pizza to order: {ex.Message}\n{ex.StackTrace}");
+                Console.WriteLine($"Error adding pizza to order: {ex.Message} {ex.StackTrace}");
                 return View("Index");
             }
         }
@@ -411,13 +411,23 @@ namespace TalkToMeMario.Controllers
                 {
                     mySqlConnection.Open();
 
+                    DateTime datumTijd = datum.Date + tijd;
+
                     string updateKlantQuery = "UPDATE klant SET naam = @klantNaam, telefoonnummer = @telefoonnummer WHERE klant_id = (SELECT klant_id FROM bestelling WHERE bestel_id = @bestellingId)";
                     using (MySqlCommand updateKlantCommand = new MySqlCommand(updateKlantQuery, mySqlConnection))
                     {
-                        updateKlantCommand.Parameters.AddWithValue("klantNaam", klantNaam);
+                        updateKlantCommand.Parameters.AddWithValue("@klantNaam", klantNaam);
                         updateKlantCommand.Parameters.AddWithValue("@telefoonnummer", telefoonnummer);
                         updateKlantCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
                         updateKlantCommand.ExecuteNonQuery();
+                    }
+
+                    string updateBestellingQuery = "UPDATE bestelling SET datum = @datum WHERE bestel_id = @bestellingid";
+                    using (MySqlCommand updateBestellingCommand = new MySqlCommand(updateBestellingQuery, mySqlConnection))
+                    {
+                        updateBestellingCommand.Parameters.AddWithValue("@datum", datumTijd);
+                        updateBestellingCommand.Parameters.AddWithValue("bestellingid", bestellingId);
+                        updateBestellingCommand.ExecuteNonQuery();
                     }
                 }
 
