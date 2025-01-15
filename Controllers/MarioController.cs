@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System.Reflection.Metadata.Ecma335;
 using TalkToMeMario.Models;
 
@@ -118,52 +119,6 @@ namespace TalkToMeMario.Controllers
             }
         }
 
-        //public ActionResult details(int id)
-        //{
-        //    BestellingOverViewViewModel bestelling = null;
-
-        //    try
-        //    {
-        //        using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
-        //        {
-        //            mySqlConnection.Open();
-        //            using (MySqlCommand mySqlCommand = new MySqlCommand($"SELECT id, klantnaam, status, subtotaal FROM bestellingen WHERE id = {id}", mySqlConnection))
-        //            {
-        //                using (MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader())
-        //                {
-        //                    if (mySqlDataReader.Read())
-        //                    {
-        //                        bestelling = new BestellingOverViewViewModel()
-        //                        {
-        //                            Id = mySqlDataReader.GetInt32(0),
-        //                            KlantNaam = mySqlDataReader.GetString(1),
-        //                            Tijd = mySqlDataReader.GetDateTime(2),
-        //                            Status = mySqlDataReader.GetString(3),
-        //                            SubTotaal = mySqlDataReader.GetDouble(4)
-        //                        };
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (MySqlException ex)
-        //    {
-        //        Console.WriteLine(ex.Message);
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("jammer");
-        //    }
-
-        //    if (bestelling == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return PartialView("_BestellingDetails", bestelling);
-        //}
-
         public ActionResult CreateBestellingTafel(int? bestellingId)
         {
             if (bestellingId==null)
@@ -213,14 +168,7 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string getBestellingQuery = "SELECT b.bestel_id, k.naam AS klant_naam, b.datum AS tijd, s.statusOmschrijving AS status " +
-                                                "FROM bestelling b " +
-                                                "JOIN klant k ON b.klant_id = k.klant_id " +
-                                                "JOIN bestel_regel br ON b.bestel_id = br.bestel_id " +
-                                                "JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id " +
-                                                "JOIN status s ON ps.status_id = s.status_id " +
-                                                "WHERE b.klant_id = @klantId " +
-                                                "ORDER BY b.datum DESC LIMIT 1"; 
+                    string getBestellingQuery = "SELECT b.bestel_id, k.naam AS klant_naam, b.datum AS tijd, COALESCE(s.statusOmschrijving, 'Nog geen status') AS status FROM bestelling b JOIN klant k ON b.klant_id = k.klant_id LEFT JOIN bestel_regel br ON b.bestel_id = br.bestel_id LEFT JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id LEFT JOIN status s ON ps.status_id = s.status_id WHERE b.klant_id = @klantId ORDER BY b.datum DESC LIMIT 1;";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(getBestellingQuery, mySqlConnection))
                     {
                         mySqlCommand.Parameters.AddWithValue("@klantId", klantId);
@@ -233,7 +181,6 @@ namespace TalkToMeMario.Controllers
                                     Id = reader.GetInt32(0),
                                     KlantNaam = reader.GetString(1),
                                     Tijd = reader.GetDateTime(2).ToString("HH:mm"),
-                                    Status = reader.GetString(3),
                                     SubTotaal = 0,
                                     Pizzas = pizzas
                                 };
@@ -326,7 +273,8 @@ namespace TalkToMeMario.Controllers
 
         public ActionResult CreateBestellingKlant()
         {
-            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();
+            List<PizzaOverviewViewModel> beschikbarePizzas = new List<PizzaOverviewViewModel>();
+            List<PizzaOverviewViewModel> besteldePizzas = new List<PizzaOverviewViewModel>();
             BestellingViewModel bestellingViewModel = null;
 
             try
@@ -357,10 +305,28 @@ namespace TalkToMeMario.Controllers
 
                     bestellingViewModel = GetBestellingDataFromDataBase(klantId);
 
+                    string getAllProductsQuery = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id";
+                    using (MySqlCommand getAllProductsCommand = new MySqlCommand(getAllProductsQuery, mySqlConnection))
+                    {
+                        using (MySqlDataReader reader = getAllProductsCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                beschikbarePizzas.Add(new PizzaOverviewViewModel
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Price = reader.GetDecimal(2),
+                                });
+                            }
+                        }
+                    }
+
                     CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel
                     { 
                         BestellingViewModel = bestellingViewModel, 
-                        Pizzas = pizzas
+                        BeschikbarePizzas = beschikbarePizzas,
+                        BesteldePizzas = besteldePizzas
                     };
 
                     return View(createBestellingViewModel);

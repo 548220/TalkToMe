@@ -4,7 +4,12 @@
     {
         required
         public BestellingViewModel BestellingViewModel { get; set; }
+
         required
-        public List<PizzaOverviewViewModel> Pizzas { get; set; }
+        public List<PizzaOverviewViewModel> BesteldePizzas { get; set; }
+
+        required
+        public List<PizzaOverviewViewModel> BeschikbarePizzas { get; set; }
+        
     }
 }

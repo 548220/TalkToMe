@@ -8,7 +8,7 @@
         required
             public string KlantNaam { get; set; }
 
-        required
+        
             public string Status { get; set; }
         
         required
