@@ -228,23 +228,27 @@ namespace TalkToMeMario.Controllers
         }
 
 
-        public ActionResult VoegToe(int bestellingId,int pizzaId)
+        public ActionResult VoegToe(int bestellingId, int pizzaId)
         {
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
+
+                    // Voeg pizza toe aan bestelling
                     string voegToeQuery = "INSERT INTO bestel_regel (bestel_id, product_id, aantal) VALUES (@bestellingId, @pizzaId, 1)";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(voegToeQuery, mySqlConnection))
                     {
                         mySqlCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
-                        mySqlCommand.Parameters.AddWithValue("pizzaId", pizzaId);
+                        mySqlCommand.Parameters.AddWithValue("@pizzaId", pizzaId);
                         mySqlCommand.ExecuteNonQuery();
                     }
 
+                    // Haal bestellinggegevens op
                     BestellingViewModel bestellingViewModel = GetBestellingDataFromDataBase(bestellingId);
 
+                    // Haal alle beschikbare producten op
                     List<PizzaOverviewViewModel> beschikbarePizzas = new List<PizzaOverviewViewModel>();
                     string getAllProductsQuery = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id";
                     using (MySqlCommand getAllProductsCommand = new MySqlCommand(getAllProductsQuery, mySqlConnection))
@@ -263,21 +267,25 @@ namespace TalkToMeMario.Controllers
                         }
                     }
 
+                    // Maak ViewModel
                     CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel
                     {
                         BestellingViewModel = bestellingViewModel,
                         BeschikbarePizzas = beschikbarePizzas,
-                        BesteldePizzas = bestellingViewModel.Pizzas
+                        BesteldePizzas = bestellingViewModel?.Pizzas ?? new List<PizzaOverviewViewModel>()
                     };
+
                     return View("createBestellingKlant", createBestellingViewModel);
-                }                
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Something went wrong adding pizza to order in database");
+                Console.WriteLine($"Error adding pizza to order: {ex.Message}\n{ex.StackTrace}");
                 return View("Index");
-            }          
+            }
         }
+
+
 
         public IActionResult CheckKlaarStatus()
         {
