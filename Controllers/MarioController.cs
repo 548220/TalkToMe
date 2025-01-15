@@ -159,8 +159,8 @@ namespace TalkToMeMario.Controllers
 
         private BestellingViewModel GetBestellingDataFromDataBase(int klantId)
         {
-            //Haal bestelling op uit database
-            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();
+            // Haal bestelling op uit database
+            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();  // Zorg ervoor dat de lijst altijd leeg is, ook als er geen pizzas zijn
             BestellingViewModel bestellingViewModel = null;
 
             try
@@ -174,7 +174,7 @@ namespace TalkToMeMario.Controllers
                         mySqlCommand.Parameters.AddWithValue("@klantId", klantId);
                         using (MySqlDataReader reader = mySqlCommand.ExecuteReader())
                         {
-                            while (reader.Read())
+                            if (reader.Read())
                             {
                                 bestellingViewModel = new BestellingViewModel
                                 {
@@ -182,10 +182,16 @@ namespace TalkToMeMario.Controllers
                                     KlantNaam = reader.GetString(1),
                                     Tijd = reader.GetDateTime(2).ToString("HH:mm"),
                                     SubTotaal = 0,
-                                    Pizzas = pizzas
+                                    Pizzas = pizzas  // Geef altijd een lege lijst terug
                                 };
                             }
                         }
+                    }
+
+                    if (bestellingViewModel == null)
+                    {
+                        Console.WriteLine($"Geen bestelling gevonden voor klantId: {klantId}");
+                        return null;
                     }
 
                     string getPizzasQuery = "SELECT p.product_id, p.naam, pp.prijs " +
@@ -209,15 +215,18 @@ namespace TalkToMeMario.Controllers
                             }
                         }
                     }
+
+                    bestellingViewModel.Pizzas = pizzas;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"Fout bij ophalen van bestelling: {ex.Message}");
             }
 
             return bestellingViewModel;
         }
+
 
         public ActionResult VoegToe(int bestellingId,int pizzaId)
         {
@@ -226,22 +235,48 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = $"INSERT Pizza{pizzaId} INTO bestelling{bestellingId}";
-                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    string voegToeQuery = "INSERT INTO bestel_regel (bestel_id, product_id, aantal) VALUES (@bestellingId, @pizzaId, 1)";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(voegToeQuery, mySqlConnection))
                     {
-                        MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
+                        mySqlCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
+                        mySqlCommand.Parameters.AddWithValue("pizzaId", pizzaId);
+                        mySqlCommand.ExecuteNonQuery();
                     }
-                }
-            }
-            catch (MySqlException ex)
-            {
-                Console.WriteLine("Network Error");
+
+                    BestellingViewModel bestellingViewModel = GetBestellingDataFromDataBase(bestellingId);
+
+                    List<PizzaOverviewViewModel> beschikbarePizzas = new List<PizzaOverviewViewModel>();
+                    string getAllProductsQuery = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id";
+                    using (MySqlCommand getAllProductsCommand = new MySqlCommand(getAllProductsQuery, mySqlConnection))
+                    {
+                        using (MySqlDataReader reader = getAllProductsCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                beschikbarePizzas.Add(new PizzaOverviewViewModel
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Price = reader.GetDecimal(2)
+                                });
+                            }
+                        }
+                    }
+
+                    CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel
+                    {
+                        BestellingViewModel = bestellingViewModel,
+                        BeschikbarePizzas = beschikbarePizzas,
+                        BesteldePizzas = bestellingViewModel.Pizzas
+                    };
+                    return View("createBestellingKlant", createBestellingViewModel);
+                }                
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Something went wrong adding pizza to order in database");
-            }
-            return RedirectToAction("CreateBestellingTafel", new { bestellingId });
+                return View("Index");
+            }          
         }
 
         public IActionResult CheckKlaarStatus()
@@ -323,8 +358,8 @@ namespace TalkToMeMario.Controllers
                     }
 
                     CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel
-                    { 
-                        BestellingViewModel = bestellingViewModel, 
+                    {
+                        BestellingViewModel = bestellingViewModel,
                         BeschikbarePizzas = beschikbarePizzas,
                         BesteldePizzas = besteldePizzas
                     };
@@ -336,6 +371,34 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine(ex.Message);
                 return View("Index");
+            }
+        }
+
+
+        public ActionResult MaakBestelling(int bestellingId, string klantNaam, string telefoonnummer, DateTime datum, TimeSpan tijd)
+        {
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+
+                    string updateKlantQuery = "UPDATE klant SET naam = @klantNaam, telefoonnummer = @telefoonnummer WHERE klant_id = (SELECT klant_id FROM bestelling WHERE bestel_id = @bestellingId)";
+                    using (MySqlCommand updateKlantCommand = new MySqlCommand(updateKlantQuery, mySqlConnection))
+                    {
+                        updateKlantCommand.Parameters.AddWithValue("klantNaam", klantNaam);
+                        updateKlantCommand.Parameters.AddWithValue("@telefoonnummer", telefoonnummer);
+                        updateKlantCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
+                        updateKlantCommand.ExecuteNonQuery();
+                    }
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fout bij bijwerken klant");
+                return View("Error");
             }
         }
     }
