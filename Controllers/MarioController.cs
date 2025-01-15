@@ -236,19 +236,40 @@ namespace TalkToMeMario.Controllers
                 {
                     mySqlConnection.Open();
 
-                    // Voeg pizza toe aan bestelling
-                    string voegToeQuery = "INSERT INTO bestel_regel (bestel_id, product_id, aantal) VALUES (@bestellingId, @pizzaId, 1)";
-                    using (MySqlCommand mySqlCommand = new MySqlCommand(voegToeQuery, mySqlConnection))
+                    using (MySqlTransaction transaction = mySqlConnection.BeginTransaction())
                     {
-                        mySqlCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
-                        mySqlCommand.Parameters.AddWithValue("@pizzaId", pizzaId);
-                        mySqlCommand.ExecuteNonQuery();
-                    }
+                        try
+                        {
+                            string voegToeQuery = "INSERT INTO bestel_regel (bestel_id, product_id, aantal) VALUES (@bestellingId, @pizzaId, 1)";
+                            int bestelRegelId;
+                            using (MySqlCommand mySqlCommand = new MySqlCommand(voegToeQuery, mySqlConnection))
+                            {
+                                mySqlCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
+                                mySqlCommand.Parameters.AddWithValue("@pizzaId", pizzaId);
+                                mySqlCommand.ExecuteNonQuery();
 
-                    // Haal bestellinggegevens op
+                                bestelRegelId = (int)mySqlCommand.LastInsertedId;
+                            }
+
+                            string voegStatusToeQuery = "INSERT INTO pizza_status (bestelregel_id, status_id) VALUES (@bestelRegelId, 2)";
+                            using (MySqlCommand statusCommand = new MySqlCommand(voegStatusToeQuery, mySqlConnection))
+                            {
+                                statusCommand.Parameters.AddWithValue("bestelRegelId", bestelRegelId);
+                                statusCommand.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw new Exception("Fout bij het toevoegen van een pizza en status", ex);
+                        }
+                    }
+                    
+
                     BestellingViewModel bestellingViewModel = GetBestellingDataFromDataBase(bestellingId);
 
-                    // Haal alle beschikbare producten op
                     List<PizzaOverviewViewModel> beschikbarePizzas = new List<PizzaOverviewViewModel>();
                     string getAllProductsQuery = "SELECT p.product_id, p.naam, pp.prijs FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id";
                     using (MySqlCommand getAllProductsCommand = new MySqlCommand(getAllProductsQuery, mySqlConnection))
@@ -267,7 +288,6 @@ namespace TalkToMeMario.Controllers
                         }
                     }
 
-                    // Maak ViewModel
                     CreateBestellingViewModel createBestellingViewModel = new CreateBestellingViewModel
                     {
                         BestellingViewModel = bestellingViewModel,
