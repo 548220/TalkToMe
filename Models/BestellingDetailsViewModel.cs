@@ -5,13 +5,21 @@
         required
         public int BestellingId { get; set; }
 
+        public string KlantNaam { get; set; }
+
+        public int Telefoonnummer { get; set; }
+
+        public DateTime Datum { get; set; }
+
+        public DateTime Tijd { get; set; }
+
         required
-        public List<PizzaOverviewViewModel> Producten { get; set; }
+        public List<PizzaOverviewViewModel> BesteldeProducten { get; set; }
 
         required
         public DateTime Date { get; set; }
 
         required
-        public decimal Subtotaal { get; set; }
+        public double Subtotaal { get; set; }
     }
 }

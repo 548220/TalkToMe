@@ -8,7 +8,8 @@
         required
             public string KlantNaam { get; set; }
 
-        
+            public int TelefoonNummer { get; set; }
+
             public string Status { get; set; }
         
         required

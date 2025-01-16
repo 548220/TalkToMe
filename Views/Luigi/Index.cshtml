@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bestellingen Overzicht</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="~/css/LuigiIndex.css" >
+    <link rel="stylesheet" href="~/css/LuigiIndex.css">
 </head>
 <body>
     <div class="container">
@@ -30,13 +30,24 @@
                             {
                                 <li>
                                     <span>@pizza.Name</span>
-                                    <input type="checkbox" class="pizza-checkbox" id="pizza-@pizza.Name.Replace(" ", "-")-@bestelling.Id" onclick="markPizzaDone(this)">
-                                    <button class="btn btn-primary btn-sm" onclick="startPizzaTimer('@pizza.Name.Replace("'", "\\'")', '@bestelling.Id')">Start Timer</button>
-                                    <span id="timer-@pizza.Name.Replace(" ", "-")-@bestelling.Id" class="timer-display" data-running="false">2:30</span>
+                                    <input type="checkbox" class="pizza-checkbox"
+                                           id="pizza-@pizza.Name.Replace(" ", "-").Replace("'", "").Replace("\"", "")-@bestelling.Id"
+                                           aria-label="Markeer @pizza.Name als klaar"
+                                           onclick="markPizzaDone(this)">
+                                    <button class="btn btn-primary btn-sm"
+                                            onclick="startPizzaTimer('@pizza.Name.Replace("'", "\\'").Replace(" ", "-")', '@bestelling.Id')">
+                                        Start Timer
+                                    </button>
+                                    <span id="timer-@pizza.Name.Replace(" ", "-").Replace("'", "").Replace("\"", "")-@bestelling.Id"
+                                          class="timer-display"
+                                          data-pizza-name="@pizza.Name"
+                                          data-bestelling-id="@bestelling.Id"
+                                          data-running="false">150</span>
                                 </li>
                             }
                         </ul>
-                        <a href="@Url.Action("BestellingFinaliseren", "Luigi", new { id = bestelling.Id })" class="btn btn-secondary btn-custom">Klaar</a>
+                        <a href="@Url.Action("BestellingFinaliseren", "Luigi", new { id = bestelling.Id })"
+                           class="btn btn-secondary btn-custom">Klaar</a>
                     </div>
                 </div>
             }
@@ -44,15 +55,30 @@
     </div>
 
     <script>
-        function startPizzaTimer(pizzaName, bestellingId) { 
-            console.log("Pizza name:", pizzaName);
-            console.log("Bestelling ID:", bestellingId);
-            const timerElement = document.getElementById(`timer-${pizzaName.replace(' ', '-')}-${bestellingId}`);
-            let timeLeft = 150; 
+        function startPizzaTimer(pizzaName, bestellingId, initialTimeLeft = 150) {
+            const timerId = `timer-${pizzaName}-${bestellingId}`;
+            const timerElement = document.getElementById(timerId);
+
+            if (!timerElement) {
+                console.error(`Timer element not found for ${pizzaName} and bestelling ${bestellingId}`);
+                return;
+            }
 
             if (timerElement.dataset.running === "true") {
                 alert("De timer voor deze pizza loopt al!");
                 return;
+            }
+
+            let timeLeft = initialTimeLeft;
+            const savedTimer = localStorage.getItem(timerId);
+
+            if (savedTimer) {
+                const savedData = JSON.parse(savedTimer);
+                timeLeft = savedData.timeLeft;
+                if (savedData.running) {
+                    alert("De timer voor deze pizza loopt al!");
+                    return;
+                }
             }
 
             timerElement.dataset.running = "true";
@@ -62,12 +88,14 @@
                 const seconds = timeLeft % 60;
 
                 timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                localStorage.setItem(timerId, JSON.stringify({ timeLeft, running: true }));
 
                 if (timeLeft <= 0) {
                     clearInterval(interval);
                     timerElement.textContent = "Klaar!";
                     alert(`Timer voor pizza ${pizzaName} in bestelling ${bestellingId} is klaar!`);
                     timerElement.dataset.running = "false";
+                    localStorage.removeItem(timerId);
                 }
 
                 timeLeft--;
@@ -83,8 +111,26 @@
                 checkbox.parentElement.style.color = "black";
             }
         }
-    </script>
 
+        window.addEventListener('DOMContentLoaded', () => {
+            const timerElements = document.querySelectorAll('.timer-display');
+
+            timerElements.forEach(timerElement => {
+                const timerId = timerElement.id;
+                const savedTimer = localStorage.getItem(timerId);
+
+                if (savedTimer) {
+                    const savedData = JSON.parse(savedTimer);
+                    if (savedData.timeLeft > 0) {
+                        timerElement.textContent = `${Math.floor(savedData.timeLeft / 60)}:${(savedData.timeLeft % 60).toString().padStart(2, '0')}`;
+                        if (savedData.running) {
+                            startPizzaTimer(timerElement.dataset.pizzaName, timerElement.dataset.bestellingId, savedData.timeLeft);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

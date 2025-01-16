@@ -17,7 +17,7 @@
                 @foreach (var bestelling in Model)
                 {
                     <li class="bestelling">
-                        <a href="#" onclick="details(@bestelling.Id); return false;">
+                        <a asp-controller="Mario" asp-action="FinaliserenBestellingKlant" asp-route-bestellingId="@bestelling.Id">
                             @bestelling.KlantNaam
                             @bestelling.Tijd
                             <p>@bestelling.Status</p>
@@ -44,42 +44,6 @@
 </div>
 
 <script>
-    function details(bestellingId) 
-    {
-         fetch(`/Mario/GetBestellingDetails?bestellingId=${bestellingId}`)
-            .then(response => response.json())
-            .then(data =>
-                {
-                    if (data.succes === false)
-                    {
-                        alert("Fout bij het ophalen van details:" + data.message);
-                        return;
-                    }
-
-                    const detailsPanel = document.getElementById("detailsPanel");
-                    let html = `<h2>Details van bestelling ${bestellingId}</h2>`;
-                    html += "<ul>";
-                    data.products.forEach(product =>
-                    {
-                        html += `<li>${product.Name} - €${product.Price.toFixed(2)}</li>`;
-                    });
-                    html += `</ul><h3>Subtotaal: €${data.subTotal.toFixed(2)}</h3>`;
-
-                    html += 
-                    `
-                        <button class="btn btn-success" onclick="betaal(${bestellingId})">Betaal</button>
-                    <button class="btn btn-danger" onclick="annuleer(${bestellingId})">Annuleer</button>
-                    `;
-
-                    detailsPanel.innerHTML = html;
-                })
-                .catch(error =>
-                    {
-                        console.error("Fout bij ophalen van details:", error);
-                    });
-    }
-        
-
     document.addEventListener("DOMContentLoaded", function () {
         function checkKlaarStatus() {
             fetch('/Mario/CheckKlaarStatus')
