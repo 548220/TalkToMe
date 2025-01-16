@@ -60,23 +60,14 @@ namespace TalkToMeMario.Controllers
             return View(pizzaViewModels);
         }
 
-        // GET: PizzaController/Details/5
-        public ActionResult Details(int id)
-        {
-
-            return View();
-        }
-
-        // GET: PizzaController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: PizzaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string name, decimal price, int category)
+        public ActionResult Create(string name, double price, int category)
         {
             try
             {
@@ -88,7 +79,7 @@ namespace TalkToMeMario.Controllers
                     {
                         try
                         {
-                            string insertProductQuery = $"INSERT INTO `product` (categorie_id, naam) VALUES ({category}, {name})";
+                            string insertProductQuery = $"INSERT INTO `product` (categorie_id, naam) VALUES ({category}, '{name}')";
                             using (MySqlCommand mySqlCommand = new MySqlCommand(insertProductQuery, mySqlConnection, mySqlTransaction))
                             {
                                 mySqlCommand.ExecuteNonQuery();
@@ -124,8 +115,6 @@ namespace TalkToMeMario.Controllers
             }
             
         }
-
-        // GET: PizzaController/Edit/5
 
         // TODO: prijs nog bij
         public ActionResult Edit(int id)
