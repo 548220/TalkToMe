@@ -29,12 +29,13 @@ namespace TalkToMeMario.Controllers
                                      b.bestel_id, 
                                      k.naam AS klant_naam, 
                                      b.datum AS tijd, 
-                                     s.statusOmschrijving AS status 
-                                     FROM bestelling b 
-                                     JOIN klant k ON b.klant_id = k.klant_id 
-                                     JOIN bestel_regel br ON b.bestel_id = br.bestel_id 
-                                     JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id 
-                                     JOIN status s ON ps.status_id = s.status_id 
+                                     MAX(s.statusOmschrijving) AS status
+                                     FROM bestelling b
+                                     JOIN klant k ON b.klant_id = k.klant_id
+                                     JOIN bestel_regel br ON b.bestel_id = br.bestel_id
+                                     JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id
+                                     JOIN status s ON ps.status_id = s.status_id
+                                     GROUP BY b.bestel_id, k.naam, b.datum
                                      ORDER BY b.datum ASC;";
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
@@ -449,7 +450,6 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    //query klopt niet
                     string query = @"SELECT p.product_id, p.naam, pp.prijs, b.bestel_id, b.datum FROM bestelling b JOIN bestel_regel br ON b.bestel_id = br.bestel_id JOIN product p ON br.product_id = p.product_id JOIN product_prijs pp ON p.product_id = pp.product_id WHERE b.bestel_id = @bestellingId;";
 
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
@@ -459,6 +459,7 @@ namespace TalkToMeMario.Controllers
                         using (MySqlDataReader reader = mySqlCommand.ExecuteReader())
                         {
                             List<PizzaOverviewViewModel> producten = new List<PizzaOverviewViewModel>();
+                            DateTime? bestellingDatum = null;
 
                             while (reader.Read())
                             {
@@ -468,19 +469,41 @@ namespace TalkToMeMario.Controllers
                                     Name = reader.GetString(1),
                                     Price = reader.GetDecimal(2)
                                 });
+
+                                if (bestellingDatum == null)
+                                {
+                                    bestellingDatum = reader.GetDateTime(4);
+                                }
                             }
 
-                            bestellingdetails = new BestellingDetailsViewModel
+                            if (producten.Count > 0 && bestellingDatum.HasValue)
                             {
-                                BestellingId = bestellingId,
-                                Producten = producten,
-                                Date = reader.GetDateTime(3),
-                                Subtotaal = 32
-                            };
+                                bestellingdetails = new BestellingDetailsViewModel
+                                {
+                                    BestellingId = bestellingId,
+                                    Producten = producten,
+                                    Date = bestellingDatum.Value,
+                                    Subtotaal = 32
+                                };
+                            }
                         }
                     }
                 }
-                return Json(bestellingdetails);
+                return Json(new
+                {
+                    succes = true,
+                    data = new
+                    {
+                        products = bestellingdetails.Producten.Select(p => new
+                        {
+                            p.Id,
+                            p.Name,
+                            p.Price
+                        }),
+                        subTotal = bestellingdetails.Subtotaal,
+                        date = bestellingdetails.Date
+                    }
+                });
             }
             catch (Exception ex)
             {
