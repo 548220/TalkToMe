@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using TalkToMeMario.Models;
 using Microsoft.VisualBasic;
 using System.Runtime.InteropServices;
+using System.Transactions;
 
 namespace TalkToMeMario.Controllers
 {
@@ -75,65 +76,173 @@ namespace TalkToMeMario.Controllers
         // POST: PizzaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string name, int price)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
-                    {
-                        mySqlConnection.Open();
-                        string query = $"INSERT INTO pizza ({name}, {price}) VALUES ({name}, {price});";
-                        using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
-                        {
-                            mySqlCommand.ExecuteNonQuery();
-                        }
-                    }
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    
-                }
-            }
-            return View();
-        }
-
-        // GET: PizzaController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: PizzaController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Create(string name, decimal price, int category)
         {
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
                 {
                     mySqlConnection.Open();
-                    string query = $"UPDATE pizza SET name = naam, price = prijs, description = lekker WHERE id= {id}";
-                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+
+                    using (MySqlTransaction mySqlTransaction = mySqlConnection.BeginTransaction())
                     {
-                        mySqlCommand.ExecuteNonQuery();
+                        try
+                        {
+                            string insertProductQuery = $"INSERT INTO `product` (categorie_id, naam) VALUES ({category}, {name})";
+                            using (MySqlCommand mySqlCommand = new MySqlCommand(insertProductQuery, mySqlConnection, mySqlTransaction))
+                            {
+                                mySqlCommand.ExecuteNonQuery();
+                            }
+
+                            string getLastInsertIdQuery = "SELECT LAST_INSERT_ID();";
+                            long productId;
+                            using (MySqlCommand getLastInsertIdCommand = new MySqlCommand(getLastInsertIdQuery, mySqlConnection))
+                            {
+                                productId = Convert.ToInt64(getLastInsertIdCommand.ExecuteScalar());
+                            }
+
+                            string insertPriceQuery = $"INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES ({productId}, {price}, '2023-11-12');";
+                            using (MySqlCommand insertPriceCommand = new MySqlCommand(insertPriceQuery, mySqlConnection, mySqlTransaction))
+                            {
+                                insertPriceCommand.ExecuteNonQuery();
+                            }
+
+                            mySqlTransaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Something went wrong");
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return View();
+            }
+            
+        }
+
+        // GET: PizzaController/Edit/5
+
+        // TODO: prijs nog bij
+        public ActionResult Edit(int id)
+        {
+            try
+            {
+                PizzaOverviewViewModel pizza;
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                {
+                    mySqlConnection.Open();
+
+                    string query = $"SELECT p.product_id, p.naam, pp.prijs, p.categorie_id FROM product p INNER JOIN product_prijs pp ON p.product_id = pp.product_id WHERE p.product_id = {id}";
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        using (var reader = mySqlCommand.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                pizza = new PizzaOverviewViewModel
+                                {
+                                    Id = reader.GetInt32("product_id"),
+                                    Name = reader.GetString("naam"),
+                                    Price = reader.GetDecimal("prijs"),
+                                    CategoryId = reader.GetInt32("categorie_id"),
+                                };                              
+                            }
+                            else
+                            {
+                                return View();
+                            }
+                        }
+                    }
+                }
+                return View(pizza);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        // POST: PizzaController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(PizzaOverviewViewModel model)
+        {
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
+                {
+                    mySqlConnection.Open();
+
+                    string productQuery = $"UPDATE `product` SET Naam = '{model.Name}', categorie_id = '{model.CategoryId}' WHERE product_id = {model.Id}";
+                    using (MySqlCommand productCommand = new MySqlCommand(productQuery, mySqlConnection))
+                    {
+                        productCommand.ExecuteNonQuery();
+                    }
+
+                    //todo: fix price 
+                    decimal priceFix = model.Price / 100;
+                    string priceQuery = $"UPDATE `product_prijs` SET prijs = @prijs WHERE product_id = @product_id";
+                    using (MySqlCommand priceCommand = new MySqlCommand(priceQuery, mySqlConnection))
+                    {
+                        priceCommand.Parameters.AddWithValue("@prijs", priceFix);
+                        priceCommand.Parameters.AddWithValue("@product_id", model.Id);
+                        priceCommand.ExecuteNonQuery();
+                    }
+                }
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(model);
             }
         }
 
         // GET: PizzaController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            try
+            {
+                using (MySqlConnection mysqlconnection = new MySqlConnection(_connectionString))
+                {
+                    mysqlconnection.Open();
+
+                    using (MySqlTransaction mySqlTransaction = mysqlconnection.BeginTransaction())
+                    {
+                        try
+                        {
+                            string deleteProductPrijsQuery = $"DELETE FROM `product_prijs` WHERE product_id = {id}";
+                            using (MySqlCommand deleteProductPrijsCommand = new MySqlCommand(deleteProductPrijsQuery, mysqlconnection, mySqlTransaction))
+                            {
+                                deleteProductPrijsCommand.ExecuteNonQuery();
+                            }
+
+                            string deleteProductQuery = $"DELETE FROM `product` WHERE product_id = {id}";
+                            using (MySqlCommand deleteProductCommand = new MySqlCommand(deleteProductQuery, mysqlconnection, mySqlTransaction))
+                            {
+                                deleteProductCommand.ExecuteNonQuery();
+                            }
+
+                            mySqlTransaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            mySqlTransaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                // Voeg foutafhandeling toe indien nodig
+                return RedirectToAction("Index");
+            }
         }
 
         // POST: PizzaController/Delete/5
