@@ -44,38 +44,41 @@
 </div>
 
 <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-        function details(bestelId) {
-            fetch(`/Mario/GetBestellingDetails?id=${bestelId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const detailsPanel = document.getElementById("detailsPanel");
-                    if (data && data.pizzas) {
-                        let pizzasHtml = data.pizzas.map(pizza => `
-                            <li>
-                                ${pizza.Name} - €${pizza.Price.toFixed(2)}
-                            </li>
-                        `).join("");
-
-                        detailsPanel.innerHTML = `
-                            <h2>Bestelling Details</h2>
-                            <ul>${pizzasHtml}</ul>
-                            <p><strong>Subtotaal:</strong> €${data.subtotaal.toFixed(2)}</p>
-                        `;
-                    } else {
-                        detailsPanel.innerHTML = "<h2>Geen details gevonden voor deze bestelling.</h2>";
+    function details(bestellingId) 
+    {
+         fetch(`/Mario/GetBestellingDetails?bestellingId=${bestellingId}`)
+            .then(response => response.json())
+            .then(data =>
+                {
+                    if (data.succes === false)
+                    {
+                        alert("Fout bij het ophalen van details:" + data.message);
+                        return;
                     }
-                })
-                .catch(error => {
-                    console.error("Fout bij ophalen van details:", error);
-                    const detailsPanel = document.getElementById("detailsPanel");
-                    detailsPanel.innerHTML = "<h2>Fout bij ophalen van details.</h2>";
-                });
-        }
 
-        window.details = details; // Zorg dat de functie beschikbaar is in de globale scope
-    });
+                    const detailsPanel = document.getElementById("detailsPanel");
+                    let html = `<h2>Details van bestelling ${bestellingId}</h2>`;
+                    html += "<ul>";
+                    data.products.forEach(product =>
+                    {
+                        html += `<li>${product.Name} - €${product.Price.toFixed(2)}</li>`;
+                    });
+                    html += `</ul><h3>Subtotaal: €${data.subTotal.toFixed(2)}</h3>`;
+
+                    html += 
+                    `
+                        <button class="btn btn-success" onclick="betaal(${bestellingId})">Betaal</button>
+                    <button class="btn btn-danger" onclick="annuleer(${bestellingId})">Annuleer</button>
+                    `;
+
+                    detailsPanel.innerHTML = html;
+                })
+                .catch(error =>
+                    {
+                        console.error("Fout bij ophalen van details:", error);
+                    });
+    }
+        
 
     document.addEventListener("DOMContentLoaded", function () {
         function checkKlaarStatus() {
