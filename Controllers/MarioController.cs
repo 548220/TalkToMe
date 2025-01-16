@@ -161,8 +161,8 @@ namespace TalkToMeMario.Controllers
 
         private BestellingViewModel GetBestellingDataFromDataBase(int klantId)
         {
-            // Haal bestelling op uit database
-            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();  // Zorg ervoor dat de lijst altijd leeg is, ook als er geen pizzas zijn
+            
+            List<PizzaOverviewViewModel> pizzas = new List<PizzaOverviewViewModel>();
             BestellingViewModel bestellingViewModel = null;
 
             try
@@ -182,9 +182,9 @@ namespace TalkToMeMario.Controllers
                                 {
                                     Id = reader.GetInt32(0),
                                     KlantNaam = reader.GetString(1),
-                                    Tijd = reader.GetDateTime(2).ToString("HH:mm"),
+                                    Tijd = reader.GetDateTime(2),
                                     SubTotaal = 0,
-                                    Pizzas = pizzas  // Geef altijd een lege lijst terug
+                                    Pizzas = pizzas 
                                 };
                             }
                         }
