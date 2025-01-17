@@ -67,8 +67,9 @@ namespace TalkToMeMario.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string name, double price, int category)
+        public ActionResult Create(string name, string price, int category)
         {
+            decimal prijs = Convert.ToDecimal(price);
             try
             {
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionString))
@@ -92,9 +93,10 @@ namespace TalkToMeMario.Controllers
                                 productId = Convert.ToInt64(getLastInsertIdCommand.ExecuteScalar());
                             }
 
-                            string insertPriceQuery = $"INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES ({productId}, {price}, '2023-11-12');";
+                            string insertPriceQuery = $"INSERT INTO `product_prijs` (product_id, prijs, datum_start) VALUES ({productId}, @prijs, '2023-11-12');";
                             using (MySqlCommand insertPriceCommand = new MySqlCommand(insertPriceQuery, mySqlConnection, mySqlTransaction))
                             {
+                                insertPriceCommand.Parameters.AddWithValue("@prijs", price);
                                 insertPriceCommand.ExecuteNonQuery();
                             }
 
