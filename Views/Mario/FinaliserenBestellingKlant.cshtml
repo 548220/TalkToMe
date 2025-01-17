@@ -15,8 +15,7 @@
         <div class="card-body">
             <p><strong>Klantnaam:</strong> @Model.KlantNaam</p>
             <p><strong>Telefoonnummer:</strong> @Model.Telefoonnummer</p>
-            <p><strong>Datum:</strong> @Model.Datum.ToShortDateString()</p>
-            <p><strong>Tijd:</strong> @Model.Tijd.ToShortTimeString()</p>
+            <p><strong>Datum en Tijd:</strong> @Model.Date</p>
         </div>
     </div>
 
@@ -51,9 +50,16 @@
             <button type="submit" class="btn btn-danger">Bestelling Annuleren</button>
         </form>
 
-        <form asp-action="BetaalBestelling" asp-controller="Mario" method="post">
-            <input type="hidden" name="bestellingId" value="@Model.BestellingId" />
-            <button type="submit" class="btn btn-success">Betaal</button>
-        </form>
+        <div class="d-flex gap-2">
+            <form asp-action="BetaalBestellingContant" asp-controller="Mario" method="post">
+                <input type="hidden" name="bestellingId" value="@Model.BestellingId" />
+                <button type="submit" class="btn btn-success">Betaal Contant</button>
+            </form>
+
+            <form asp-action="BetaalBestellingPin" asp-controller="Mario" method="post">
+                <input type="hidden" name="bestellingId" value="@Model.BestellingId" />
+                <button type="submit" class="btn btn-success">Betaal Pin</button>
+            </form>
+        </div>
     </div>
 </div>

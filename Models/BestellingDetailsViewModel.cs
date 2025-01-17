@@ -11,8 +11,6 @@
 
         public DateTime Datum { get; set; }
 
-        public DateTime Tijd { get; set; }
-
         required
         public List<PizzaOverviewViewModel> BesteldeProducten { get; set; }
 

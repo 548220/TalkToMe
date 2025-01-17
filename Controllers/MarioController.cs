@@ -5,6 +5,7 @@ using Org.BouncyCastle.Asn1.X509;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Cryptography.X509Certificates;
 using TalkToMeMario.Models;
 
@@ -395,10 +396,10 @@ namespace TalkToMeMario.Controllers
             using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
             {
                 mySqlConnection.Open();
-                string query = "SELECT b.bestel_id, k.naam AS klant_naam, b.datum AS tijd, COALESCE(s.statusOmschrijving, 'Nog geen status') AS status FROM bestelling b JOIN klant k ON b.klant_id = k.klant_id LEFT JOIN bestel_regel br ON b.bestel_id = br.bestel_id LEFT JOIN pizza_status ps ON br.bestelregel_id = ps.bestelregel_id LEFT JOIN status s ON ps.status_id = s.status_id WHERE b.bestel_id = @bestelId ORDER BY b.datum DESC LIMIT 1;";
+                string query = "SELECT b.bestel_id, k.naam AS klantnaam, k.telefoonnummer, b.datum FROM bestelling b JOIN klant k ON b.klant_id = k.klant_id WHERE b.bestel_id = @bestelId;";
                 using (MySqlCommand getBestellingCommand = new MySqlCommand(query, mySqlConnection))
                 {
-                    getBestellingCommand.Parameters.AddWithValue("bestelId", bestellingId);
+                    getBestellingCommand.Parameters.AddWithValue("@bestelId", bestellingId);
                     using (MySqlDataReader reader = getBestellingCommand.ExecuteReader())
                     {
                         if (reader.Read())
@@ -407,7 +408,8 @@ namespace TalkToMeMario.Controllers
                             {
                                 Id = reader.GetInt32(0),
                                 KlantNaam = reader.GetString(1),
-                                Tijd = reader.GetDateTime(2),
+                                TelefoonNummer = reader.GetInt32(2),
+                                Tijd = reader.GetDateTime(3),
                                 SubTotaal = 0,
                                 Pizzas = pizzas
                             };
@@ -451,6 +453,54 @@ namespace TalkToMeMario.Controllers
             }
         }
 
+        public ActionResult BetaalBestellingContant(int bestellingId)
+        {
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string query = "INSERT INTO `betaling` (`bestel_id`, `betaalWijze_id`, `betaalStatus_id`, `bedrag`) VALUES (@bestelId, '1', '1', '17');";
+
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        mySqlCommand.Parameters.AddWithValue("@bestelId", bestellingId);
+
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult BetaalBestellingPin(int bestellingId)
+        {
+            try
+            {
+                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
+                {
+                    mySqlConnection.Open();
+                    string query = "INSERT INTO `betaling` (`bestel_id`, `betaalWijze_id`, `betaalStatus_id`, `bedrag`) VALUES (@bestelId, '2', '1', '17');";
+
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
+                    {
+                        mySqlCommand.Parameters.AddWithValue("@bestelId", bestellingId);
+
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return RedirectToAction("Index");
+        }
+
         public ActionResult AnnuleerBestelling(int bestellingId)
         {
             try
@@ -458,10 +508,12 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = "";
-                    
+                    string query = "UPDATE pizza_status ps JOIN bestel_regel br ON ps.bestelRegel_id = br.bestelRegel_id SET ps.status_id = 3 WHERE br.bestel_id = @bestellingId;";
+
                     using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
                     {
+                        mySqlCommand.Parameters.AddWithValue("@bestellingId", bestellingId);
+
                         mySqlCommand.ExecuteNonQuery();
                     }
                 }
@@ -470,29 +522,7 @@ namespace TalkToMeMario.Controllers
             {
                 Console.WriteLine(ex.Message);
             }
-            return View("Index");
-        }
-
-        public ActionResult BetaalBestelling(int bestellingId)
-        {
-            try
-            {
-                using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
-                {
-                    mySqlConnection.Open();
-                    string query = "";
-
-                    using (MySqlCommand mySqlCommand = new MySqlCommand(query, mySqlConnection))
-                    {
-                        mySqlCommand.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return View("Index");
+            return RedirectToAction("Index");
         }
     }
 }
