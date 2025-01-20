@@ -200,10 +200,12 @@ namespace TalkToMeMario.Controllers
                                 bestelRegelId = (int)mySqlCommand.LastInsertedId;
                             }
 
-                            string voegStatusToeQuery = "INSERT INTO pizza_status (bestelregel_id, status_id) VALUES (@bestelRegelId, 2)";
+                            string voegStatusToeQuery = "INSERT INTO pizza_status (bestelregel_id, status_id, changed_at) VALUES (@bestelRegelId, 2, @dateTime)";
+                            DateTime dateTime = DateTime.Now;
                             using (MySqlCommand statusCommand = new MySqlCommand(voegStatusToeQuery, mySqlConnection))
                             {
-                                statusCommand.Parameters.AddWithValue("bestelRegelId", bestelRegelId);
+                                statusCommand.Parameters.AddWithValue("@bestelRegelId", bestelRegelId);
+                                statusCommand.Parameters.AddWithValue("@dateTime", dateTime);
                                 statusCommand.ExecuteNonQuery();
                             }
 

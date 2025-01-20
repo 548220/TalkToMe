@@ -103,12 +103,14 @@
         }
 
         function markPizzaDone(checkbox) {
-            if (checkbox.checked) {
-                checkbox.parentElement.style.textDecoration = "line-through";
-                checkbox.parentElement.style.color = "#6c757d";
-            } else {
-                checkbox.parentElement.style.textDecoration = "none";
-                checkbox.parentElement.style.color = "black";
+        const pizzaNameSpan = checkbox.parentElement.querySelector('span');
+
+        if (checkbox.checked) {
+                pizzaNameSpan.style.textDecoration = "line-through";
+                pizzaNameSpan.style.color = "#6c757d";
+        } else {
+                pizzaNameSpan.style.textDecoration = "none";
+                pizzaNameSpan.style.color = "black";
             }
         }
 

@@ -26,7 +26,7 @@ namespace TalkToMeMario.Controllers
                 using (MySqlConnection mySqlConnection = new MySqlConnection(_connectionstring))
                 {
                     mySqlConnection.Open();
-                    string query = @"SELECT
+                    string query = @"SELECT DISTINCT
                                      b.bestel_id,
                                      k.naam AS klant_naam, 
                                      b.datum AS tijd,
